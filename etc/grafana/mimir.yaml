@@ -1,0 +1,37 @@
+target: all,alertmanager
+multitenancy_enabled: false
+
+server:
+  http_listen_port: 9009
+  log_level: info
+
+common:
+  storage:
+    backend: filesystem
+    filesystem:
+      dir: /var/mimir/wal
+
+blocks_storage:
+  storage_prefix: blocks
+  tsdb:
+    dir: /var/mimir/tsdb
+
+ingester:
+  ring:
+    replication_factor: 1
+
+limits:
+  max_global_exemplars_per_user: 10000
+
+ruler:
+  rule_path: /var/mimir/ruler
+  alertmanager_url: http://localhost:9009/alertmanager
+  ring:
+    # Quickly detect unhealthy rulers to speed up the tutorial.
+    heartbeat_period: 2s
+    heartbeat_timeout: 10s
+
+alertmanager:
+  data_dir: /var/alertmanager
+  fallback_config_file: /etc/alertmanager-fallback-config.yaml
+  external_url: http://localhost:9009/alertmanager

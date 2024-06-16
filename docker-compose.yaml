@@ -1,0 +1,145 @@
+---
+volumes:
+  wordpress:
+  db:
+  mimir:
+  loki:
+  tempo:
+
+networks:
+  app:
+  backend:
+  observability:
+
+services:
+  wordpress:
+    build:
+      context: .
+      dockerfile: Containerfile.wordpress
+      target: wordpress
+    networks:
+      - app
+      - backend
+      - observability
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress-password
+
+      # OTel auto instrumentation config
+      # https://opentelemetry.io/docs/instrumentation/php/automatic/#installation
+      OTEL_PHP_AUTOLOAD_ENABLED: true
+      OTEL_SERVICE_NAME: wordpress-demo
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+    volumes:
+      - wordpress:/var/www/html
+
+  wordpress-nginx:
+    image: wordpress-nginx
+    build:
+      context: .
+      dockerfile: Containerfile.wordpress
+      target: nginx
+    environment:
+      UPSTREAM_HOST: wordpress:9000
+    volumes:
+      - wordpress:/var/www/html:ro
+    networks:
+      - app
+    ports:
+      - 8080:80
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress-password
+      MYSQL_ROOT_PASSWORD: root-password
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - backend
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.102.1
+    volumes:
+      - ./etc/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    networks:
+      - observability
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    volumes:
+      - ./etc/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQLStreaming metricsSummary
+    networks:
+      - observability
+    ports:
+      - 3000:3000
+
+  mimir:
+    image: grafana/mimir:main-011c02fbc
+    command: ["-config.file=/etc/mimir.yaml"]
+    volumes:
+      - ./etc/grafana/mimir.yaml:/etc/mimir.yaml
+      - ./etc/grafana/alertmanager.yaml:/etc/alertmanager-fallback-config.yaml
+      - mimir:/var/mimir
+    networks:
+      - observability
+    ports:
+      - 9009:9009
+
+  loki-init:
+    image: &lokiImage grafana/loki:main-9767807
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/loki"
+    volumes:
+      - loki:/var/loki
+
+  loki:
+    image: *lokiImage
+    command: ["-config.file=/etc/loki.yaml"]
+    volumes:
+      - ./etc/grafana/loki.yaml:/etc/loki.yaml
+      - loki:/var/loki
+    networks:
+      - observability
+    ports:
+      - 3100:3100
+    depends_on:
+      - loki-init
+
+  tempo-init:
+    image: &tempoImage grafana/tempo:main-17c5e7d
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/tempo"
+    volumes:
+      - tempo:/var/tempo
+
+  tempo:
+    image: *tempoImage
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./etc/grafana/tempo.yaml:/etc/tempo.yaml
+      - tempo:/var/tempo
+    networks:
+      - observability
+    ports:
+      - 3200:3200
+    depends_on:
+      - tempo-init

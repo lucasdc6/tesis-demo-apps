@@ -1,0 +1,21 @@
+# Dependencias para el funcionamiento de Opentelemetry
+FROM composer:2.5 AS build
+COPY etc/php/composer.json ./
+RUN composer install --ignore-platform-reqs
+
+# Instalacion de wordpress
+FROM wordpress:6.5.4-php8.3-fpm AS wordpress
+RUN pecl install opentelemetry protobuf ;\
+    docker-php-ext-enable \
+      opentelemetry.so \
+      protobuf.so
+COPY etc/php/otel.php.ini $PHP_INI_DIR/conf.d/.
+COPY --from=build /app/vendor /var/www/otel
+ENV OTEL_AUTOLOAD_PATH=/var/www/otel/autoload.php
+
+FROM nginx:1.26.0 AS nginx
+
+ENV NGINX_CLIENT_MAX_BODY_SIZE="0"
+
+COPY etc/nginx/wordpress.conf.template /etc/nginx/templates/default.conf.template
+COPY etc/nginx/40-check-env-variables.sh /docker-entrypoint.d
