@@ -1,4 +1,6 @@
 receivers:
+  fluentforward:
+    endpoint: 0.0.0.0:8006
   otlp:
     protocols:
       http:
@@ -6,14 +8,28 @@ receivers:
 
 processors:
   batch:
-
   memory_limiter:
     check_interval: 1s
     limit_percentage: 65
     spike_limit_percentage: 20
 
+connectors:
+  spanmetrics:
+    namespace: otel
+    histogram:
+      explicit:
+        buckets: [250ms, 500ms, 750ms, 1s, 5s, 10s]
+    dimensions:
+      - name: http.method
+        default: GET
+      - name: http.status_code
+
 exporters:
-  logging:
+  logging/metrics:
+    verbosity: detailed
+  logging/logs:
+    verbosity: detailed
+  logging/traces:
     verbosity: detailed
   otlphttp:
     metrics_endpoint: "http://mimir:9009/otlp"
@@ -25,16 +41,15 @@ exporters:
 service:
   pipelines:
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, spanmetrics]
       processors: [memory_limiter, batch]
-      exporters: [logging, otlphttp]
-
+      exporters: [logging/metrics, otlphttp]
     logs:
-      receivers: [otlp]
+      receivers: [otlp, fluentforward]
       processors: [memory_limiter, batch]
-      exporters: [logging, otlphttp]
+      exporters: [logging/logs, otlphttp]
 
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [logging, otlphttp]
+      exporters: [logging/traces, otlphttp, spanmetrics]

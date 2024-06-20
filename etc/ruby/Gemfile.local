@@ -1,0 +1,6 @@
+gem 'opentelemetry-sdk', '~> 1.4', '>= 1.4.1'
+gem 'opentelemetry-exporter-otlp', '~> 0.28.0'
+gem 'opentelemetry-instrumentation-all', '~> 0.61.0'
+gem 'lograge', '~> 0.14.0'
+gem 'fluent-logger', '~> 0.9.1'
+gem 'health_check', '~> 3.1'

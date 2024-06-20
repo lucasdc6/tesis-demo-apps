@@ -1,0 +1,32 @@
+FROM redmine:5.1.3-alpine as redmine
+
+COPY etc/ruby/Gemfile.local Gemfile.local
+
+RUN apk add -U build-base --virtual .build-deps \
+    && echo "$RAILS_ENV:" > ./config/database.yml \
+    && BUNDLER_WITHOUT="development test" \ 
+    && echo "$RAILS_ENV:" > ./config/database.yml \
+    && echo "  adapter: mysql2" >> ./config/database.yml \
+    && su-exec redmine bundle install --jobs "$(nproc)" \
+    && rm ./config/database.yml \
+    && sed -i "s/root :to => 'welcome#index'/root :to => 'my#page'/" /usr/src/redmine/config/routes.rb \
+    && sed -i "/^  root/a\\\n  health_check_routes" /usr/src/redmine/config/routes.rb \
+    && sed -i "s/bundle check/# bundle check/g" /docker-entrypoint.sh \
+    && sed -i 's/rails | rake | passenger/rake | redmine-migrate | puma | sidekiq/' /docker-entrypoint.sh \
+    && apk del .build-deps
+
+ENV REDMINE_NO_DB_MIGRATE=1
+USER redmine 
+
+COPY --chown=redmine:redmine etc/ruby/additional_environment.rb config/additional_environment.rb
+COPY --chown=redmine:redmine etc/ruby/puma.rb config/puma.rb
+COPY --chown=redmine:redmine --chmod=755 etc/ruby/redmine-migrate /usr/local/bin
+COPY --chown=redmine:redmine etc/ruby/otel.rb config/initializers/otel.rb
+
+CMD [ "puma", "-C", "config/puma.rb" ]
+
+FROM nginx:1.26.0 AS nginx
+ENV NGINX_CLIENT_MAX_BODY_SIZE="0"
+
+COPY etc/nginx/redmine.conf.template /etc/nginx/templates/default.conf.template
+COPY etc/nginx/40-check-env-variables.sh /docker-entrypoint.d

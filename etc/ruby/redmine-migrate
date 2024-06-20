@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+# If plugins are not initialized this will fail.
+# So when migrations are run this shall not be present.
+mkdir -p /tmp/redmine-plugins
+mv /usr/src/redmine/plugins/* /tmp/redmine-plugins
+
+if rake db:migrate; then
+    # This last command changes Gemfile.lock because of plugins abscense.
+    # Is needed to restore them back.
+    mv /tmp/redmine-plugins/* /usr/src/redmine/plugins
+    rake redmine:plugins:migrate
+else
+    mv /tmp/redmine-plugins/* /usr/src/redmine/plugins
+    exit 1
+fi
