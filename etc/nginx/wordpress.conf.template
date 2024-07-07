@@ -1,50 +1,57 @@
+upstream app {
+  server ${UPSTREAM_HOST} fail_timeout=0 max_fails=0;
+}
+
 server {
-    listen 80;
-    server_name  _;
-    root /var/www/html;
+  listen 80;
+  server_name  _;
+  root /var/www/html;
 
-    index index.php;
+  index index.php;
 
-    large_client_header_buffers 4 16k;
+  large_client_header_buffers 4 16k;
+  client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE};
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
+  access_log /dev/stdout;
+  error_log /dev/stderr;
 
-    location ~ [^/]\.php(/|$) {
-        fastcgi_pass ${UPSTREAM_HOST};
-        fastcgi_split_path_info ^(.+\.php)(/.*)$;
-        fastcgi_index index.php;
-        client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE};
-        include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-    }
+  location / {
+    try_files $uri $uri/ =404;
+  }
 
-    location ~ /\.(?!well-known).* {
-        return 404;
-    }
+  location ~ [^/]\.php(/|$) {
+    include fastcgi_params;
+    fastcgi_index index.php;
+    fastcgi_pass app;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_param PATH_INFO $fastcgi_path_info;
+  }
 
-    location ~ (/vendor/|/node_modules/|composer\.json|/readme|/README|readme\.txt|/upgrade\.txt|db/install\.xml|/fixtures/|/behat/|phpunit\.xml|\.lock|environment\.xml|doesnotexist) {
-        deny all;
-        return 404;
-    }
+  location /_check {
+    access_log    off;
+    log_not_found off;
+    return 200;
+  }
 
-    location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
-        expires 5d;
-    }
+  location ~ /\.(?!well-known).* {
+    return 404;
+  }
 
-    # Deny access to . files, for security
-    location ~ /\. {
-        log_not_found off;
-        deny all;
-    }
+  location ~ (/vendor/|/node_modules/|composer\.json|/readme|/README|readme\.txt|/upgrade\.txt|db/install\.xml|/fixtures/|/behat/|phpunit\.xml|\.lock|environment\.xml|doesnotexist) {
+    deny all;
+    return 404;
+  }
 
-    location /_check {
-      access_log    off;
-      log_not_found off;
-      return 200;
-    }
+  location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
+    expires 5d;
+  }
 
-    include /etc/nginx/custom/*.conf;
+  # Deny access to . files, for security
+  location ~ /\. {
+    log_not_found off;
+    deny all;
+  }
+
+  include /etc/nginx/custom/*.conf;
 }
