@@ -1,0 +1,66 @@
+---
+volumes:
+  wagtail_data:
+
+networks:
+  app:
+  backend:
+  observability:
+
+services:
+  wagtail: &wagtail
+    image: wagtail
+    build:
+      context: .
+      dockerfile: Containerfile.wagtail
+      target: wagtail
+    environment:
+      DJANGO_SECRET_KEY: changeme
+      DATABASE_URL: postgres://wagtail:wagtail-password@pg-db/wagtail
+      REDIS_URL: redis://redis
+      DJANGO_SETTINGS_MODULE: bakerydemo.settings.dev
+    volumes:
+      - wagtail_data:/app/bakerydemo
+    networks:
+      - app
+      - backend
+      - observability
+
+  wagtail-migrations:
+    <<: *wagtail
+    ports: []
+    command:
+      - wagtail-migrate
+    networks:
+      - app
+      - backend
+      - observability
+
+  wagtail-nginx:
+    image: wagtail-nginx
+    build:
+      context: .
+      dockerfile: Containerfile.wagtail
+      target: nginx
+    environment:
+      UPSTREAM_HOST: wagtail:8000
+    volumes:
+      - wagtail_data:/app/bakerydemo:ro
+    networks:
+      - app
+    ports:
+      - 8080:80
+
+  pg-db:
+    image: postgres:14.1
+    environment:
+      POSTGRES_DB: wagtail
+      POSTGRES_USER: wagtail
+      POSTGRES_PASSWORD: wagtail-password
+    networks:
+      - backend
+
+  redis:
+    image: redis:6.2
+    networks:
+      - backend

@@ -1,0 +1,59 @@
+FROM python:3.9-slim AS wagtail
+
+WORKDIR /app
+ENV VIRTUAL_ENV=/venv \
+  PATH=/venv/bin:$PATH \
+  PYTHONPATH=/app/ \
+  STATIC_DIR=/app/bakerydemo/media/ \
+  DJANGO_SETTINGS_MODULE=bakerydemo.settings.production \
+  DJANGO_DEBUG=off \
+  PORT=8000
+
+RUN set -ex \
+  && RUN_DEPS=" \
+    libexpat1 \
+    libjpeg62-turbo \
+    libpcre3 \
+    libpq5 \
+    mime-support \
+    postgresql-client \
+    procps \
+    zlib1g \
+    " \
+  && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
+  && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
+  && BUILD_DEPS=" \
+    build-essential \
+    curl \
+    git \
+    libexpat1-dev \
+    libjpeg62-turbo-dev \
+    libpcre3-dev \
+    libpq-dev \
+    zlib1g-dev \
+  " \
+  && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+  && git clone --depth 1 --branch v5.1 https://github.com/wagtail/bakerydemo.git /app  \
+  && python3.9 -m venv ${VIRTUAL_ENV} \
+  && pip install -U pip \
+  && pip install --no-cache-dir -r requirements/production.txt \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /app/bakerydemo/media/images \
+  && mkdir -p /app/bakerydemo/media/original_images \
+  && chown -R 1000:2000 /app/bakerydemo/media \
+  && mkdir -p /app/bakerydemo/collect_static \
+  && chown -R 1000:2000 /app/bakerydemo/collect_static
+
+COPY etc/python/uwsgi.ini /app/etc/uwsgi.ini
+COPY --chmod=0755 etc/python/docker-entrypoint.sh /app/docker-entrypoint.sh
+COPY --chmod=0755 etc/python/wagtail-migrate /usr/local/bin/wagtail-migrate
+VOLUME ["/app/bakerydemo/media/images/"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["uwsgi", "/app/etc/uwsgi.ini"]
+
+FROM nginx:1.26.0 AS nginx
+ENV NGINX_CLIENT_MAX_BODY_SIZE="0"
+
+COPY etc/nginx/wagtail.conf.template /etc/nginx/templates/default.conf.template
+COPY etc/nginx/40-check-env-variables.sh /docker-entrypoint.d

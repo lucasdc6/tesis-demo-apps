@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+echo "Running migrate..."
+/venv/bin/python manage.py migrate --noinput
+echo
+echo "Running load_initial_data..."
+/venv/bin/python manage.py load_initial_data

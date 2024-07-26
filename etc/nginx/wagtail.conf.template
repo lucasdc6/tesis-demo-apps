@@ -1,0 +1,53 @@
+upstream app {
+  server ${UPSTREAM_HOST} fail_timeout=0 max_fails=0;
+}
+
+server {
+  listen 80;
+  server_name _;
+
+  root /app/bakerydemo;
+
+  try_files $uri/index.html $uri @app;
+  large_client_header_buffers 4 16k;
+  client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE};
+
+  access_log /dev/stdout;
+  error_log /dev/stderr;
+
+  location @app {
+    proxy_pass http://app;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    proxy_set_header X-Forwarded-Port  $http_x_forwarder_port;
+    proxy_set_header X-Forwarded-Host  $http_host;
+    proxy_redirect off;
+  }
+
+  location /_check {
+    access_log off;
+    log_not_found off;
+    return 200;
+  }
+
+  location ~ /\.(?!well-known).* {
+    return 404;
+  }
+
+  location ~ (/vendor/|/node_modules/|composer\.json|/readme|/README|readme\.txt|/upgrade\.txt|db/install\.xml|/fixtures/|/behat/|phpunit\.xml|\.lock|environment\.xml|doesnotexist) {
+    deny all;
+    return 404;
+  }
+
+  location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
+    expires 5d;
+  }
+
+  # Deny access to . files, for security
+  location ~ /\. {
+    log_not_found off;
+    deny all;
+  }
+
+  include /etc/nginx/custom/*.conf;
+}
