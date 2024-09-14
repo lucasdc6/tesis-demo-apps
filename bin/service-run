@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source _helper_cli
+
+docker compose ${compose_files} up -d

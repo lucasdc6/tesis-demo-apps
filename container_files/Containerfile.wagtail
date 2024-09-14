@@ -33,10 +33,13 @@ RUN set -ex \
     zlib1g-dev \
   " \
   && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
-  && git clone --depth 1 --branch v5.1 https://github.com/wagtail/bakerydemo.git /app  \
-  && python3.9 -m venv ${VIRTUAL_ENV} \
+  && git clone --depth 1 --branch v5.1 https://github.com/wagtail/bakerydemo.git /app
+
+COPY etc/python/requirements.txt requirements.txt
+RUN python3.9 -m venv ${VIRTUAL_ENV} \
   && pip install -U pip \
-  && pip install --no-cache-dir -r requirements/production.txt \
+  && pip install --no-cache-dir -r requirements.txt \
+  && opentelemetry-bootstrap -a install \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /app/bakerydemo/media/images \
@@ -46,11 +49,12 @@ RUN set -ex \
   && chown -R 1000:2000 /app/bakerydemo/collect_static
 
 COPY etc/python/uwsgi.ini /app/etc/uwsgi.ini
+COPY etc/python/custom.py /app/bakerydemo/settings/custom.py
 COPY --chmod=0755 etc/python/docker-entrypoint.sh /app/docker-entrypoint.sh
 COPY --chmod=0755 etc/python/wagtail-migrate /usr/local/bin/wagtail-migrate
 VOLUME ["/app/bakerydemo/media/images/"]
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["uwsgi", "/app/etc/uwsgi.ini"]
+CMD ["opentelemetry-instrument", "uwsgi", "/app/etc/uwsgi.ini"]
 
 FROM nginx:1.26.0 AS nginx
 ENV NGINX_CLIENT_MAX_BODY_SIZE="0"

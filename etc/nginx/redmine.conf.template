@@ -12,7 +12,7 @@ server {
   error_page 500 502 503 504 /500.html;
 
   large_client_header_buffers 4 16k;
-  client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE}
+  client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE};
 
   access_log /dev/stdout;
   error_log /dev/stderr;

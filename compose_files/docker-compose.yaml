@@ -6,6 +6,7 @@ volumes:
   tempo:
 
 networks:
+  app:
   backend:
   observability:
 
@@ -16,21 +17,42 @@ services:
       MYSQL_ROOT_PASSWORD: root-password
     volumes:
       - db:/var/lib/mysql
-      - ./etc/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./etc/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - backend
+
+  lb:
+    image: nginx:1.26.0
+    environment:
+      WORDPRESS_HOST: wordpress-nginx
+      WORDPRESS_SERVER_NAME: wordpress.localhost
+      REDMINE_HOST: redmine-nginx
+      REDMINE_SERVER_NAME: redmine.localhost
+      WAGTAIL_HOST: wagtail-nginx
+      WAGTAIL_SERVER_NAME: wagtail.localhost
+      GRAFANA_HOST: grafana:3000
+      GRAFANA_SERVER_NAME: grafana.localhost
+    volumes:
+      - ./etc/nginx/00-lb-entrypoint.sh:/docker-entrypoint.d/00-lb-entrypoint.sh:ro
+      - ./etc/nginx/lb.conf.template:/tmp/lb.conf.template:ro
+      - ./etc/nginx/grafana.conf.template:/etc/nginx/templates/grafana.conf.template:ro
+    networks:
+      - app
+      - observability
+    ports:
+      - 80:80
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.102.1
     volumes:
-      - ./etc/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+      - ./etc/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
     networks:
       - observability
 
   grafana:
     image: grafana/grafana:11.0.0
     volumes:
-      - ./etc/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./etc/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -38,20 +60,16 @@ services:
       - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQLStreaming metricsSummary
     networks:
       - observability
-    ports:
-      - 3000:3000
 
   mimir:
     image: grafana/mimir:main-011c02fbc
     command: ["-config.file=/etc/mimir.yaml"]
     volumes:
-      - ./etc/grafana/mimir.yaml:/etc/mimir.yaml
-      - ./etc/grafana/alertmanager.yaml:/etc/alertmanager-fallback-config.yaml
       - mimir:/var/mimir
+      - ./etc/grafana/mimir.yaml:/etc/mimir.yaml:ro
+      - ./etc/grafana/alertmanager.yaml:/etc/alertmanager-fallback-config.yaml:ro
     networks:
       - observability
-    ports:
-      - 9009:9009
 
   loki-init:
     image: &lokiImage grafana/loki:main-9767807
@@ -71,8 +89,6 @@ services:
       - loki:/var/loki
     networks:
       - observability
-    ports:
-      - 3100:3100
     depends_on:
       - loki-init
 
@@ -94,7 +110,5 @@ services:
       - tempo:/var/tempo
     networks:
       - observability
-    ports:
-      - 3200:3200
     depends_on:
       - tempo-init

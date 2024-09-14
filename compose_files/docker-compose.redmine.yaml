@@ -12,8 +12,8 @@ services:
   redmine: &redmine
     image: redmine
     build:
-      context: .
-      dockerfile: Containerfile.redmine
+      context: ..
+      dockerfile: container_files/Containerfile.redmine
       target: redmine
     environment:
       REDMINE_DB_MYSQL: db
@@ -44,8 +44,8 @@ services:
   redmine-nginx:
     image: redmine-nginx
     build:
-      context: .
-      dockerfile: Containerfile.redmine
+      context: ..
+      dockerfile: container_files/Containerfile.redmine
       target: nginx
     environment:
       UPSTREAM_HOST: redmine:3000
@@ -53,5 +53,3 @@ services:
       - redmine_public:/usr/share/nginx/html:ro
     networks:
       - app
-    ports:
-      - 8081:80

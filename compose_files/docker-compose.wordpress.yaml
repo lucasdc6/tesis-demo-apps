@@ -11,8 +11,8 @@ services:
   wordpress:
     image: wordpress
     build:
-      context: .
-      dockerfile: Containerfile.wordpress
+      context: ..
+      dockerfile: container_files/Containerfile.wordpress
       target: wordpress
     environment:
       WORDPRESS_DB_HOST: db
@@ -38,8 +38,8 @@ services:
   wordpress-nginx:
     image: wordpress-nginx
     build:
-      context: .
-      dockerfile: Containerfile.wordpress
+      context: ..
+      dockerfile: container_files/Containerfile.wordpress
       target: nginx
     environment:
       UPSTREAM_HOST: wordpress:9000
@@ -47,5 +47,3 @@ services:
       - wordpress:/var/www/html:ro
     networks:
       - app
-    ports:
-      - 8080:80

@@ -1,6 +1,6 @@
 {
-    "name": "opentelemetry/wordpress-example",
-    "description": "An example of autoinstrumentation of wordpress with the official wordpress docker image",
+    "name": "opentelemetry/wordpress-demo",
+    "description": "Demo de instrumentación de opentelemetry para la tesis Observabilidad, una base para aplicaciones resilientes",
     "type": "project",
     "minimum-stability": "beta",
     "require": {

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+if [ "$#" -ne 1 ]; then
+  echo "You need to specify the service name"
+  exit 1
+fi
+
+service_name=$1
+compose_files="-f compose_files/docker-compose.yaml"
+
+case "$service_name" in
+  wordpress|wp)
+    compose_files="${compose_files} -f compose_files/docker-compose.wordpress.yaml"
+    ;;
+  redmine)
+    compose_files="${compose_files} -f compose_files/docker-compose.redmine.yaml"
+    ;;
+  wagtail)
+    compose_files="${compose_files} -f compose_files/docker-compose.wagtail.yaml"
+    ;;
+  all)
+    compose_files="${compose_files} -f compose_files/docker-compose.wordpress.yaml  -f compose_files/docker-compose.redmine.yaml  -f compose_files/docker-compose.wagtail.yaml"
+    ;;
+  *)
+    echo "Unknown service. Choose one of 'wordpress', 'redmine', 'wagtail' or 'all'"
+    exit 2
+esac
