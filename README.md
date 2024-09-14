@@ -13,7 +13,7 @@ Para poner en funcionamiento las demos, es necesario contar con
 ## Iniciar ambiente
 
 El ambiente de las pruebas se encuentra dividido en diferentes archivos
-`docker compose`
+`docker compose` que se pueden encontrar en el directorio `compose_files`
 
 - `docker-compose.yaml`: Archivo principal que cuenta con todos los servicios
   base necesarios para la ejecución de las pruebas, tales como
@@ -44,41 +44,28 @@ El ambiente de las pruebas se encuentra dividido en diferentes archivos
 Para iniciar los servicios base, ejecutar
 
 ```bash
-docker compose up
-# O alternativamente se puede enviar la ejecución al background
-docker compose up -d
+./bin/service-run base
 ```
 
 Luego, podemos levantar las demo ejecutando
 
 ```bash
-docker compose -f docker-compose.<DEMO>.yaml up -d
+./bin/service-run <DEMO>
 
 # Por ejemplo, para levantar wordpress
-docker compose -f docker-compose.wordpress.yaml up -d
+./bin/service-run wordpress
 ```
 
 Alternmativamente, podemos ejecutar todos los servicios con un solo comando
 
 ```bash
-docker compose \
-  -f docker-compose.yaml \
-  -f docker-compose.wordpress.yaml \
-  -f docker-compose.redmine.yaml \
-  -f docker-compose.wagtail.yaml \
-  up
+./bin/service-run all
 ```
-> Recordar que se puede enviar al background usando el flag `-d`
 
 Luego, para eliminar todos los recursos creados por docker, ejecutar
 
 ```bash
-docker compose \
-  -f docker-compose.yaml \
-  -f docker-compose.wordpress.yaml \
-  -f docker-compose.redmine.yaml \
-  -f docker-compose.wagtail.yaml \
-  down -v
+./bin/service-stop all
 ```
 
 > Notar que el flag `-v` va a borrar los volumenes
