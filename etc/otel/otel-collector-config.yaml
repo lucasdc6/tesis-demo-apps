@@ -25,6 +25,12 @@ connectors:
       - name: http.status_code
 
 exporters:
+  file/metrics:
+    path: /var/otel/file-exporter/metrics.json
+  file/logs:
+    path: /var/otel/file-exporter/logs.json
+  file/traces:
+    path: /var/otel/file-exporter/traces.json
   logging/metrics:
     verbosity: detailed
   logging/logs:
@@ -43,13 +49,13 @@ service:
     metrics:
       receivers: [otlp, spanmetrics]
       processors: [memory_limiter, batch]
-      exporters: [logging/metrics, otlphttp]
+      exporters: [logging/metrics, file/metrics, otlphttp]
     logs:
       receivers: [otlp, fluentforward]
       processors: [memory_limiter, batch]
-      exporters: [logging/logs, otlphttp]
+      exporters: [logging/logs, file/logs, otlphttp]
 
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [logging/traces, otlphttp, spanmetrics]
+      exporters: [logging/traces, otlphttp, file/traces, spanmetrics]

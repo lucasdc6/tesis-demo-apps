@@ -7,6 +7,7 @@ if [ "$#" -lt 1 ]; then
 fi
 
 compose_files=""
+restart_lb=false
 for arg in "$@"; do
   case "$arg" in
     base|b)
@@ -14,12 +15,15 @@ for arg in "$@"; do
       ;;
     wordpress|wp)
       compose_files="${compose_files} -f compose_files/docker-compose.wordpress.yaml"
+      restart_lb=true
       ;;
     redmine|r)
       compose_files="${compose_files} -f compose_files/docker-compose.redmine.yaml"
+      restart_lb=true
       ;;
     wagtail|wt)
       compose_files="${compose_files} -f compose_files/docker-compose.wagtail.yaml"
+      restart_lb=true
       ;;
     all)
       compose_files="-f compose_files/docker-compose.yaml -f compose_files/docker-compose.wordpress.yaml  -f compose_files/docker-compose.redmine.yaml  -f compose_files/docker-compose.wagtail.yaml"

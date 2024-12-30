@@ -17,7 +17,7 @@ services:
       MYSQL_ROOT_PASSWORD: root-password
     volumes:
       - db:/var/lib/mysql
-      - ./etc/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ../etc/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - backend
 
@@ -33,9 +33,9 @@ services:
       GRAFANA_HOST: grafana:3000
       GRAFANA_SERVER_NAME: grafana.localhost
     volumes:
-      - ./etc/nginx/00-lb-entrypoint.sh:/docker-entrypoint.d/00-lb-entrypoint.sh:ro
-      - ./etc/nginx/lb.conf.template:/tmp/lb.conf.template:ro
-      - ./etc/nginx/grafana.conf.template:/etc/nginx/templates/grafana.conf.template:ro
+      - ../etc/nginx/00-lb-entrypoint.sh:/docker-entrypoint.d/00-lb-entrypoint.sh:ro
+      - ../etc/nginx/lb.conf.template:/tmp/lb.conf.template:ro
+      - ../etc/nginx/grafana.conf.template:/etc/nginx/templates/grafana.conf.template:ro
     networks:
       - app
       - observability
@@ -45,14 +45,15 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.102.1
     volumes:
-      - ./etc/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+      - ../etc/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+      - ../data:/var/otel/file-exporter:rwz
     networks:
       - observability
 
   grafana:
     image: grafana/grafana:11.0.0
     volumes:
-      - ./etc/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - ../etc/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -66,8 +67,8 @@ services:
     command: ["-config.file=/etc/mimir.yaml"]
     volumes:
       - mimir:/var/mimir
-      - ./etc/grafana/mimir.yaml:/etc/mimir.yaml:ro
-      - ./etc/grafana/alertmanager.yaml:/etc/alertmanager-fallback-config.yaml:ro
+      - ../etc/grafana/mimir.yaml:/etc/mimir.yaml:ro
+      - ../etc/grafana/alertmanager.yaml:/etc/alertmanager-fallback-config.yaml:ro
     networks:
       - observability
 
@@ -85,7 +86,7 @@ services:
     image: *lokiImage
     command: ["-config.file=/etc/loki.yaml"]
     volumes:
-      - ./etc/grafana/loki.yaml:/etc/loki.yaml
+      - ../etc/grafana/loki.yaml:/etc/loki.yaml
       - loki:/var/loki
     networks:
       - observability
@@ -106,7 +107,7 @@ services:
     image: *tempoImage
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
-      - ./etc/grafana/tempo.yaml:/etc/tempo.yaml
+      - ../etc/grafana/tempo.yaml:/etc/tempo.yaml
       - tempo:/var/tempo
     networks:
       - observability

@@ -3,3 +3,8 @@
 source _helper_cli
 
 docker compose ${compose_files} up -d
+
+if [ "$restart_lb" = "true" ]; then
+  echo "Restarting LB"
+  docker compose -f ${compose_files} restart lb
+fi
