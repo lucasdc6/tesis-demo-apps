@@ -19,6 +19,10 @@ services:
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress-password
+      WORDPRESS_DEBUG: "true"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', '/dev/stderr');
+        define('WP_DEBUG_DISPLAY', false);
 
       # OTel auto instrumentation config
       # https://opentelemetry.io/docs/instrumentation/php/automatic/#installation
