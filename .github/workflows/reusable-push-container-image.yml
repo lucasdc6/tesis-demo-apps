@@ -1,0 +1,63 @@
+name: Create and publish a Docker image
+
+on:
+  workflow_call:
+    inputs:
+      product_name:
+        type: string
+        description: Nombre del producto
+        required: true
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) Docker image
+        id: meta-docker
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/${{ inputs.product_name }}/app
+          tags: |
+            type=match,pattern=${{ inputs.product_name }}-v(.*),group=1
+
+      - name: Extract metadata (tags, labels) for NGINX Docker image
+        id: meta-docker-nginx
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/${{ inputs.product_name }}/nginx
+          tags: |
+            type=match,pattern=${{ inputs.product_name }}-v(.*),group=1
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta-docker.outputs.tags }}
+          labels: ${{ steps.meta-docker.outputs.labels }}
+          file: container_files/Containerfile.${{ inputs.product_name }}
+          target: ${{ inputs.product_name }}
+
+      - name: Build and push NGINX Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta-docker-nginx.outputs.tags }}
+          labels: ${{ steps.meta-docker-nginx.outputs.labels }}
+          file: container_files/Containerfile.${{ inputs.product_name }}
+          target: nginx

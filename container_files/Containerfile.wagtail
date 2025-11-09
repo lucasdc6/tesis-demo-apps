@@ -1,4 +1,4 @@
-FROM python:3.9-slim AS wagtail
+FROM python:3.9-slim-bookworm AS wagtail
 
 WORKDIR /app
 ENV VIRTUAL_ENV=/venv \

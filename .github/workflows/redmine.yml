@@ -1,0 +1,16 @@
+name: Redmine build and push container image
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "redmine-v*"
+
+jobs:
+  build-and-push-image:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/reusable-push-container-image.yml
+    with:
+      product_name: redmine

@@ -49,6 +49,8 @@ services:
       target: nginx
     environment:
       UPSTREAM_HOST: redmine:3000
+    depends_on:
+      - redmine
     volumes:
       - redmine_public:/usr/share/nginx/html:ro
     networks:

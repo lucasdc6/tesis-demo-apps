@@ -1,0 +1,16 @@
+name: Wagtail build and push container image
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "wagtail-v*"
+
+jobs:
+  build-and-push-image:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/reusable-push-container-image.yml
+    with:
+      product_name: wagtail
