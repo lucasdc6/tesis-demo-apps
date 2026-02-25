@@ -341,3 +341,141 @@ que define la infraestructura de observabilidad (colector de OpenTelemetry, Mimi
 Tempo y Grafana) y archivos adicionales para cada aplicación demo. Esto permite iniciar
 únicamente los servicios necesarios para cada caso de prueba y garantiza que el entorno
 local sea funcionalmente equivalente al productivo.
+
+---
+
+## Despliegue en Kubernetes
+
+Para complementar la prueba de concepto basada en Docker Compose, se desarrolló un
+ambiente de despliegue equivalente sobre Kubernetes. El objetivo de esta extensión es
+demostrar que la arquitectura de observabilidad no está atada a un entorno de ejecución
+específico, e introducir una capacidad que el ambiente local no contempla: el escalado
+automático de los servicios impulsado por las propias señales de telemetría recolectadas.
+
+### Infraestructura del cluster
+
+El cluster se levanta localmente con [Kind](https://kind.sigs.k8s.io/) (*Kubernetes in
+Docker*), que crea un cluster de Kubernetes utilizando contenedores Docker como nodos.
+El script `kubernetes/cluster-setup up` automatiza la creación del cluster y la
+instalación de tres componentes de infraestructura mediante Helmfile:
+
+| Componente | Función |
+|---|---|
+| **ingress-nginx** | Controlador de Ingress que expone los servicios en `*.localhost` mediante hostPort 80/443 |
+| **KEDA** | Operador de escalado automático basado en métricas externas |
+| **lgtm-distributed** | Stack de observabilidad: Loki + Grafana + Tempo + Mimir |
+
+Los tres componentes se instalan en orden: primero ingress-nginx (del que dependen los
+Ingress de todas las aplicaciones posteriores), luego KEDA, y finalmente el stack LGTM.
+Grafana queda disponible en `http://grafana.localhost` con acceso anónimo en rol de
+administrador, sin necesidad de login.
+
+### Chart de despliegue
+
+Las aplicaciones demo se despliegan mediante un Helm chart genérico ubicado en `helm/`.
+Cada release genera los siguientes recursos de Kubernetes:
+
+- Un **Deployment** con dos contenedores en el mismo pod —la aplicación y el sidecar de
+  Nginx—, replicando el patrón de imagen dual del ambiente Docker Compose. Un hook
+  `postStart` copia los archivos estáticos de la aplicación a un volumen compartido
+  (`emptyDir`) del que el sidecar los sirve directamente.
+- Un **ConfigMap** y un **Secret** que inyectan las variables de entorno (credenciales
+  de base de datos, endpoints del colector, configuración del servicio), manteniendo la
+  conformidad con el tercer factor de la metodología Twelve-Factor.
+- Un **Ingress** para exponer el servicio bajo el dominio `<app>.localhost`.
+- Opcionalmente, un **PersistentVolumeClaim** para los archivos subidos por los usuarios
+  (habilitado en WordPress y Wagtail).
+
+### Escalado automático con KEDA
+
+KEDA (*Kubernetes Event-Driven Autoscaling*) extiende Kubernetes con la capacidad de
+escalar Deployments en respuesta a métricas provenientes de fuentes externas al cluster.
+En esta PoC se utiliza el escalador de tipo `prometheus`, que consulta periódicamente la
+API compatible con Prometheus expuesta por Mimir.
+
+La métrica empleada es `traces_spanmetrics_calls_total`, generada automáticamente por el
+conector `spanmetrics` del OTel Collector a partir de las trazas recibidas de las
+aplicaciones. Este es un ejemplo concreto del valor compuesto de la instrumentación: sin
+ningún cambio adicional, la telemetría recolectada para su análisis en Grafana alimenta
+directamente la lógica de escalado del cluster.
+
+Para cada aplicación se define un recurso `ScaledObject`. El correspondiente a Wagtail
+es el siguiente:
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: wagtail
+  namespace: demo-apps
+spec:
+  scaleTargetRef:
+    name: wagtail
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  cooldownPeriod: 60
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://lgtm-distributed-mimir-nginx.observability.svc/prometheus
+        metricName: wagtail_request_rate
+        threshold: "10"
+        query: >
+          sum(rate(traces_spanmetrics_calls_total{service_name="wagtail"}[1m]))
+```
+
+Este recurso instruye a KEDA para que, cuando la tasa de peticiones supere los
+10 req/s por réplica activa, ordene al scheduler de Kubernetes incrementar el número
+de réplicas del Deployment de Wagtail hasta un máximo de cinco. El campo
+`cooldownPeriod` define el tiempo mínimo —en segundos— que debe transcurrir con la
+carga por debajo del umbral antes de iniciar una reducción de réplicas.
+
+### Prueba de carga con Locust
+
+Para demostrar el circuito completo —desde el aumento de carga hasta el escalado
+automático reflejado en los dashboards—, se utilizan los mismos scripts de Locust
+desarrollados para el ambiente Docker Compose. Los archivos `locust/wagtail.py`,
+`locust/wordpress.py` y `locust/redmine.py` simulan usuarios navegando los recursos
+más frecuentes de cada aplicación. El archivo `locust/all.py` combina los tres perfiles
+de usuario con pesos distintos (WordPress 3x, Redmine 2x, Wagtail 2x), permitiendo
+estresar las tres aplicaciones en simultáneo desde una única ejecución.
+
+La prueba se lanza contra las URLs de los Ingress del cluster:
+
+```bash
+locust -f locust/all.py \
+  --users 50 --spawn-rate 5 \
+  --headless --run-time 3m
+```
+
+Locust incrementa el número de usuarios concurrentes a razón de 5 por segundo hasta
+alcanzar los 50, mantiene la carga durante el período configurado y luego la detiene
+de forma abrupta.
+
+### Escalado observable en Grafana
+
+A medida que el tráfico generado por Locust aumenta, el siguiente flujo puede
+observarse en los dashboards de Grafana:
+
+1. **Tasa de peticiones en ascenso**: el panel de métricas RED muestra el incremento
+   de `requests/s` para cada servicio, derivado en tiempo real por el conector
+   `spanmetrics` a partir de las trazas que las aplicaciones envían al colector.
+2. **Evaluación del umbral por KEDA**: KEDA consulta Mimir cada pocos segundos con la
+   query PromQL configurada. En cuanto el valor calculado supera el umbral de 10 req/s
+   por réplica, KEDA emite una instrucción de escalado.
+3. **Inicio de nuevos pods**: el panel de Kubernetes muestra el incremento en el
+   número de réplicas del Deployment; los nuevos pods pasan por los estados `Pending`
+   → `ContainerCreating` → `Running` en el transcurso de algunos segundos.
+4. **Estabilización de la latencia**: una vez que las réplicas adicionales están listas
+   y el balanceador de carga distribuye el tráfico entre ellas, la latencia promedio
+   (percentil 95) cae hacia los valores basales observados al inicio de la prueba.
+5. **Scale-down**: al finalizar la carga, la tasa de peticiones decae. Pasado el
+   período de enfriamiento (`cooldownPeriod`), KEDA reduce el Deployment a una única
+   réplica, y el dashboard refleja tanto la reducción de réplicas como la normalización
+   de todas las métricas.
+
+Este ciclo cierra el argumento central de la tesina: las señales de observabilidad no
+solo permiten *comprender* el estado del sistema, sino que pueden actuar directamente
+como insumo de mecanismos de resiliencia automática. La misma telemetría que un operador
+consulta en un dashboard para diagnosticar un problema de capacidad es la que KEDA
+evalúa para resolverlo de forma autónoma, sin intervención manual.
