@@ -1,0 +1,11 @@
+repositories:
+  - name: ganesha-nfs
+    url: https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/
+---
+releases:
+  - name: ganesha-nfs
+    chart: ganesha-nfs/nfs-server-provisioner
+    namespace: ganesha-nfs
+    version: 1.8.0
+    values:
+      - values/ganesha.yaml

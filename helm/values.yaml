@@ -13,11 +13,15 @@ app:
   env: {}
   secretEnv: {}
   migrations:
+    enabled: true
     extraEnvs: {}
     args: []
+    volumeMounts: []
+    volumes: []
   port: ""
   staticDir: ""
   fileDir: ""
+  extraPostStartCommands: []
 
   # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe:
@@ -95,6 +99,7 @@ nginx:
     # runAsNonRoot: true
     # runAsUser: 1000
 
+  staticMountPath: /usr/share/nginx/html
   # Additional volumeMounts on the output Deployment definition.
   volumeMounts: []
   # - name: foo
@@ -160,6 +165,44 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+route:
+  # -- Enables or disables the route
+  enabled: false
+  tracing:
+    enabled: false
+
+  # -- Set the route apiVersion, e.g. gateway.networking.k8s.io/v1 or gateway.networking.k8s.io/v1alpha2
+  apiVersion: gateway.networking.k8s.io/v1
+  # -- Set the route kind
+  # Valid options are GRPCRoute, HTTPRoute, TCPRoute, TLSRoute, UDPRoute
+  kind: HTTPRoute
+
+  annotations: {}
+  labels: {}
+
+  hostnames: []
+  # - my-filter.example.com
+  parentRefs: []
+  # - name: acme-gw
+
+  matches:
+    - path:
+        type: PathPrefix
+        value: /
+
+  ## Filters define the filters that are applied to requests that match this rule.
+  filters: []
+
+  ## Additional custom rules that can be added to the route
+  additionalRules: []
+
+  ## httpsRedirect adds a filter for redirecting to https (HTTP 301 Moved Permanently).
+  ## To redirect HTTP traffic to HTTPS, you need to have a Gateway with both HTTP and HTTPS listeners.
+  ## Matches and filters do not take effect if enabled.
+  ## Ref. https://gateway-api.sigs.k8s.io/guides/http-redirect-rewrite/
+  httpsRedirect: false
+
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+function generate_image() {
+  local service
+  service=$1
+
+  echo "Generating ${service} images"
+  docker compose -f compose_files/docker-compose.${service}.yaml build
+}
+
+function load_image() {
+  local service
+  service=$1
+
+  echo "Loading ${service} images to kind"
+  kind load docker-image --name demo-apps ${service} ${service}-nginx
+}
+
+generate_image redmine
+generate_image wagtail
+generate_image wordpress
+
+cd kubernetes
+
+load_image redmine
+load_image wagtail
+load_image wordpress

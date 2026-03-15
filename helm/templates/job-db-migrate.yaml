@@ -1,10 +1,11 @@
+{{- if .Values.app.migrations.enabled }}
 {{- if not .Values.app.migrations.args }}
 {{- fail "You must specify the migration command at '.app.migrations.args'" }}
 {{- end }}
 apiVersion: batch/v1
 kind: Job
 metadata: 
-  name: {{ include "application.fullname" . }}
+  name: {{ include "application.fullname" . }}-{{ randNumeric 5 }}
   annotations:
     "helm.sh/hook": pre-install, pre-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded
@@ -34,6 +35,10 @@ spec:
           {{- with .Values.app.migrations.args }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.app.migrations.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -46,3 +51,8 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

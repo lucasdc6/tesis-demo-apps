@@ -1,0 +1,8 @@
+image:
+  repository: bitnamilegacy/postgresql
+  tag: 14.18.0-debian-12-r0
+
+auth:
+  database: wagtail
+  username: wagtail
+  password: wagtail-password

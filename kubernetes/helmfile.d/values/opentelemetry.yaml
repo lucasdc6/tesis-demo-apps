@@ -1,0 +1,64 @@
+image:
+  repository: otel/opentelemetry-collector-contrib
+
+mode: deployment
+
+ports:
+  fluent:
+    enabled: true
+    containerPort: 8006
+    servicePort: 8006
+    protocol: TCP    
+
+config:
+  receivers:
+    fluentforward:
+      endpoint: 0.0.0.0:8006
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  processors:
+    batch: {}
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 65
+      spike_limit_percentage: 20
+    filter/spans:
+      error_mode: ignore
+      traces:
+        span:
+          - IsMatch(attributes["http.target"], "^/.*health_check*")
+          - attributes["identifier"] == "text template"
+
+  exporters:
+    debug/metrics:
+      verbosity: detailed
+    debug/logs:
+      verbosity: detailed
+    debug/traces:
+      verbosity: detailed
+    otlphttp:
+      metrics_endpoint: "http://mimir-gateway.mimir/otlp/v1/metrics"
+      logs_endpoint: "http://loki-gateway.loki/otlp/v1/logs"
+      traces_endpoint: "http://tempo-gateway.tempo/otlp/v1/traces"
+      tls:
+        insecure: true
+
+  service:
+    pipelines:
+      metrics:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlphttp, debug/metrics]
+      logs:
+        receivers: [otlp]
+        processors: [memory_limiter, batch]
+        exporters: [otlphttp, debug/logs]
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch, filter/spans]
+        exporters: [otlphttp, debug/traces]

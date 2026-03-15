@@ -1,0 +1,53 @@
+fullnameOverride: wordpress
+
+imagePullSecrets:
+  - name: github-registry
+
+app:
+  image:
+    repository: ghcr.io/lucasdc6/tesis-demo-apps/wordpress/app
+    tag: latest
+  port: 9000
+  staticDir: /var/www/html
+  fileDir: /var/www/html/wp-content/uploads
+  extraPostStartCommands:
+    - sleep 5
+  migrations:
+    enabled: false
+  livenessProbe: null
+  readinessProbe: null
+  env:
+    WORDPRESS_DB_HOST: wordpress-db-mysql
+    WORDPRESS_DB_NAME: wordpress
+    WORDPRESS_DB_USER: wordpress
+    WORDPRESS_DEBUG: "true"
+    WORDPRESS_CONFIG_EXTRA: |
+      define('WP_DEBUG_LOG', '/dev/stderr');
+      define('WP_DEBUG_DISPLAY', false);
+    # OTel auto instrumentation config
+    # https://opentelemetry.io/docs/instrumentation/php/automatic/#installation
+    OTEL_PHP_AUTOLOAD_ENABLED: "true"
+    OTEL_SERVICE_NAME: wordpress-demo
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
+    OTEL_TRACES_EXPORTER: otlp
+    OTEL_METRICS_EXPORTER: otlp
+    OTEL_LOGS_EXPORTER: otlp
+  secretEnv:
+    WORDPRESS_DB_PASSWORD: wordpress-password
+
+nginx:
+  image:
+    repository: ghcr.io/lucasdc6/tesis-demo-apps/wordpress/nginx
+    tag: latest
+  staticMountPath: /var/www/html
+
+route:
+  enabled: true
+  tracing:
+    enabled: true
+  hostnames:
+    - wordpress.localhost
+  parentRefs:
+    - name: nginx
+      namespace: nginx-gateway
+      sectionName: http

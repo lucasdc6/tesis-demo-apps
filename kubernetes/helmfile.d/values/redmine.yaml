@@ -1,0 +1,61 @@
+fullnameOverride: redmine
+
+imagePullSecrets:
+  - name: github-registry
+
+app:
+  image:
+    repository: ghcr.io/lucasdc6/tesis-demo-apps/redmine/app
+    tag: latest
+  port: 3000
+  staticDir: /usr/src/redmine/public
+  fileDir: /usr/src/redmine/files
+  env:
+    REDMINE_DB_MYSQL: redmine-db-mysql
+    REDMINE_DB_DATABASE: redmine
+    REDMINE_DB_USERNAME: redmine
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
+    OTEL_SERVICE_NAME: redmine-demo
+    OTEL_PROPAGATORS: tracecontext,baggage
+    FLUENTD_URL: http://opentelemetry-collector.opentelemetry:8006/redmine-demo
+  secretEnv:
+    REDMINE_DB_PASSWORD: redmine-password
+  migrations:
+    args:
+      - redmine-migrate
+  livenessProbe:
+    httpGet:
+      path: /health_check/site
+      port: app
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 4
+  readinessProbe:
+    httpGet:
+      path: /health_check/site
+      port: app
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 4
+
+nginx:
+  image:
+    repository: ghcr.io/lucasdc6/tesis-demo-apps/redmine/nginx
+    tag: latest
+
+
+persistence:
+  enabled: true
+  size: "5Gi"
+  storageClass: nfs
+
+route:
+  enabled: true
+  tracing:
+    enabled: true
+  hostnames:
+    - redmine.localhost
+  parentRefs:
+    - name: nginx
+      namespace: nginx-gateway
+      sectionName: http

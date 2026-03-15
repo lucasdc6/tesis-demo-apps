@@ -14,14 +14,6 @@ server {
   access_log /dev/stdout;
   error_log /dev/stderr;
 
-  location /static/ {
-    alias /app/bakerydemo/collect_static/;
-  }
-
-  location /media/ {
-    root /app/bakerydemo/media;
-  }
-
   location / {
     proxy_pass http://app;
     proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
@@ -47,7 +39,6 @@ server {
   }
 
   location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
-    try_files $uri $uri/ =404;
     expires 5d;
   }
 

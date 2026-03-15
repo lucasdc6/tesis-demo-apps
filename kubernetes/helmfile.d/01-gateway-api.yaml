@@ -1,0 +1,23 @@
+repositories:
+  - name: nginx
+    url: ghcr.io/nginx/charts
+    oci: true
+---
+releases:
+  - name: gateway-api-crds
+    disableValidationOnInstall: true
+    wait: true
+    namespace: kube-system
+    version: 2.0.0
+    chart: ../charts/gateway-api-crd
+
+  - name: nginx-gateway-fabric
+    wait: true
+    namespace: nginx-gateway
+    version: 2.4.*
+    disableValidationOnInstall: true
+    chart: nginx/nginx-gateway-fabric
+    values:
+      - values/gateway-api.yaml
+    needs:
+      - kube-system/gateway-api-crds
