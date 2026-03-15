@@ -1,6 +1,10 @@
 config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
 config.lograge.enabled = true
+config.lograge.ignore_custom = lambda do |event|
+  event.payload[:controller] == "HealthCheck::HealthCheckController"
+end
+
 config.logger = ActiveSupport::Logger.new(STDOUT)
 
 if ENV['FLUENTD_URL']

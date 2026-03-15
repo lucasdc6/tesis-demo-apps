@@ -3,6 +3,8 @@ minio:
 
 mimir:
   structuredConfig:
+    limits:
+      max_global_exemplars_per_user: 100000
     alertmanager_storage:
       backend: s3
       s3:

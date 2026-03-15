@@ -33,6 +33,25 @@ config:
         span:
           - IsMatch(attributes["http.target"], "^/.*health_check*")
           - attributes["identifier"] == "text template"
+    transform/fluent_logs:
+      error_mode: ignore
+      log_statements:
+        - context: log
+          statements:
+            - set(resource.attributes["service.name"], attributes["service"])
+
+  connectors:
+    spanmetrics:
+      namespace: traces_spanmetrics
+      exemplars:
+        enabled: true
+      histogram:
+        explicit:
+          buckets: [250ms, 500ms, 750ms, 1s, 5s, 10s]
+      dimensions:
+        - name: http.method
+          default: GET
+        - name: http.status_code
 
   exporters:
     debug/metrics:
@@ -51,14 +70,14 @@ config:
   service:
     pipelines:
       metrics:
-        receivers: [otlp]
+        receivers: [otlp, spanmetrics]
         processors: [memory_limiter, batch]
-        exporters: [otlphttp, debug/metrics]
+        exporters: [otlphttp]
       logs:
-        receivers: [otlp]
-        processors: [memory_limiter, batch]
+        receivers: [otlp, fluentforward]
+        processors: [memory_limiter, transform/fluent_logs, batch]
         exporters: [otlphttp, debug/logs]
       traces:
         receivers: [otlp]
         processors: [memory_limiter, batch, filter/spans]
-        exporters: [otlphttp, debug/traces]
+        exporters: [otlphttp, spanmetrics]

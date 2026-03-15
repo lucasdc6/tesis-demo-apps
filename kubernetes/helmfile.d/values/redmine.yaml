@@ -59,3 +59,13 @@ route:
     - name: nginx
       namespace: nginx-gateway
       sectionName: http
+
+autoscaling:
+  enabled: true
+  prometheusServerAddr: http://mimir-gateway.mimir.svc/prometheus
+  query: >
+    sum(
+      rate(
+        traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
+      )
+    )

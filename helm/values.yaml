@@ -209,8 +209,14 @@ autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  cooldownPeriod: 60
+  prometheusServerAddr: ""
+  query: >
+    sum(
+      rate(
+        traces_spanmetrics_calls{service_name="{{ include "application.fullname" . }}"}[2m]
+      )
+    )
 
 # Additional volumes on the output Deployment definition.
 volumes: []

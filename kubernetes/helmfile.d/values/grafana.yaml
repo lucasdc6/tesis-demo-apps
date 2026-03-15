@@ -19,27 +19,48 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
-      - name: Loki
-        uid: loki
-        type: loki
-        url: http://loki-gateway.loki
-        isDefault: false
       - name: Mimir
         uid: prom
         type: prometheus
         url: http://mimir-gateway.mimir/prometheus
         isDefault: true
+        jsonData:
+          httpMethod: "POST"
+          exemplarTraceIdDestinations:
+            - datasourceUid: "tempo"
+              name: "trace_id"
+      - name: Loki
+        uid: loki
+        type: loki
+        url: http://loki-gateway.loki
+        isDefault: false
+        jsonData:
+          derivedFields:
+            - name: "trace_id"
+              matcherType: label
+              matcherRegex: trace_id
+              datasourceUid: "tempo"
+              urlDisplayLabel: "View Trace in Tempo"
+              url: "$${__value.raw}"
+              internalLink: true
       - name: Tempo
         uid: tempo
         type: tempo
         url: http://tempo-query-frontend.tempo:3200
         isDefault: false
         jsonData:
-          tracesToLogsV2:
-            datasourceUid: loki
           lokiSearch:
             datasourceUid: loki
           tracesToMetrics:
             datasourceUid: prom
           serviceMap:
             datasourceUid: prom
+          httpMethod: GET
+          tracesToLogsV2:
+            datasourceUid: 'loki'
+            spanStartTimeShift: '-5m'
+            spanEndTimeShift: '5m'
+            groupFilters: []
+            customQuery: true
+            query: '{$${__tags}} | trace_id = "$${__trace.traceId}"'
+            tags: [{ key: 'service.name', value: 'service_name' }]
