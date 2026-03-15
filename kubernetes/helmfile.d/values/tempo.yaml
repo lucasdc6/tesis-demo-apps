@@ -1,0 +1,24 @@
+gateway:
+  enabled: true
+
+traces:
+  otlp:
+    http:
+      enabled: true
+      receiverConfig: {}
+    grpc:
+      enabled: true
+      receiverConfig: {}
+      port: 4317
+
+
+storage:
+  trace:
+    backend: s3
+    s3:
+      bucket: tempo
+      endpoint: minio.minio.svc:9000
+      access_key: tempo
+      secret_key: tempo12345
+      insecure: true
+      forcepathstyle: true

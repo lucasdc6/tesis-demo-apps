@@ -1,0 +1,83 @@
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: jitterbit
+    url: https://jitterbit.github.io/charts
+
+releases:
+  ##################
+  # Redmine
+  ##################
+  - name: redmine-regcred
+    namespace: redmine
+    chart: jitterbit/dockerconfigjson
+    version: 1.0.*
+    secrets:
+      - values/github-registry.yaml
+  - name: redmine-db
+    namespace: redmine
+    chart: bitnami/mysql
+    version: 14.0.*
+    values:
+      - values/redmine-db.yaml
+  - name: redmine
+    namespace: redmine
+    chart: ../../helm
+    values:
+      - values/redmine.yaml
+    needs:
+      - redmine/redmine-regcred
+      - redmine/redmine-db
+  ##################
+  # Wordpress
+  ##################
+  - name: wordpress-regcred
+    namespace: wordpress
+    chart: jitterbit/dockerconfigjson
+    version: 1.0.*
+    secrets:
+      - values/github-registry.yaml
+  - name: wordpress-db
+    namespace: wordpress
+    chart: bitnami/mysql
+    version: 14.0.*
+    values:
+      - values/wordpress-db.yaml
+  - name: wordpress
+    namespace: wordpress
+    chart: ../../helm
+    values:
+      - values/wordpress.yaml
+    needs:
+      - wordpress/wordpress-regcred
+      - wordpress/wordpress-db
+  ##################
+  # Wagtail
+  ##################
+  - name: wagtail-regcred
+    namespace: wagtail
+    chart: jitterbit/dockerconfigjson
+    version: 1.0.*
+    secrets:
+      - values/github-registry.yaml
+  - name: wagtail-db
+    namespace: wagtail
+    chart: bitnami/postgresql
+    version: 18.0.*
+    values:
+      - values/wagtail-db.yaml
+  - name: wagtail-redis
+    namespace: wagtail
+    chart: bitnami/redis
+    version: 24.1.*
+    values:
+      - values/wagtail-redis.yaml
+  - name: wagtail
+    namespace: wagtail
+    chart: ../../helm
+    values:
+      - values/wagtail.yaml
+    needs:
+      - wagtail/wagtail-regcred
+      - wagtail/wagtail-db
+      - wagtail/wagtail-redis

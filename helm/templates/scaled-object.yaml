@@ -1,0 +1,20 @@
+{{- if .Values.autoscaling.enabled }}
+{{- $service_name := .Values.app.env.OTEL_SERVICE_NAME | default (include "application.fullname" .) -}}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "application.fullname" . }}
+spec:
+  scaleTargetRef:
+    name: {{ include "application.fullname" . }}
+  minReplicaCount: {{ .Values.autoscaling.minReplicas }}
+  maxReplicaCount: {{ .Values.autoscaling.maxReplicas }}
+  cooldownPeriod: {{ .Values.autoscaling.cooldownPeriod }}
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.autoscaling.prometheusServerAddr | required "You must define 'autoscaling.prometheusServerAddr'" }}
+        metricName: "{{ $service_name }}_request_rate"
+        threshold: "10"
+        query: {{ tpl (toYaml .Values.autoscaling.query) . | nindent 10 }}
+{{- end }}

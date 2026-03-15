@@ -1,0 +1,16 @@
+global:
+  nodeSelector: {}
+  tolerations: []
+
+persistence:
+  enabled: true
+  size: 10Gi
+service:
+  type: ClusterIP
+storageClass:
+  reclaimPolicy: Retain
+  mountOptions:
+    - "vers=4.1"
+    - retrans=2
+    - timeo=30
+

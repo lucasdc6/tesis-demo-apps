@@ -1,0 +1,35 @@
+nginx:
+  config:
+    telemetry:
+      exporter:
+        endpoint: opentelemetry-collector.opentelemetry:4317
+      spanAttributes:
+      - key: cluster
+        value: kind
+  service:
+    type: NodePort
+    nodePorts:
+    - port: 30080
+      listenerPort: 80
+    - port: 30443
+      listenerPort: 443
+  pod:
+    nodeSelector:
+      ingress-ready: "true"
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        action: NoSchedule
+
+gateways:
+  - name: nginx
+    namespace: nginx-gateway
+    spec:
+      gatewayClassName: nginx
+      listeners:
+        - name: http
+          port: 80
+          protocol: HTTP
+          hostname: "*.localhost"
+          allowedRoutes:
+            namespaces:
+              from: All

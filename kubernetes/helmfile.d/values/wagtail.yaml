@@ -1,0 +1,70 @@
+fullnameOverride: wagtail
+
+imagePullSecrets:
+  - name: github-registry
+
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: nfs
+
+app:
+  image:
+    repository: ghcr.io/lucasdc6/tesis-demo-apps/wagtail/app
+    tag: latest
+  port: 8000
+  staticDir: /app/bakerydemo/collect_static
+  fileDir: /app/bakerydemo/media
+  extraPostStartCommands:
+    - python manage.py collectstatic
+    - python manage.py load_initial_data
+    - cp /app/bakerydemo/media/original_images/* /app/bakerydemo/media/images
+  migrations:
+    args:
+      - wagtail-migrate
+    volumes:
+  livenessProbe: null
+  readinessProbe: null
+  env:
+    REDIS_URL: redis://redis
+    DJANGO_SETTINGS_MODULE: bakerydemo.settings.custom
+    OTEL_SERVICE_NAME: wagtail-demo
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
+    OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+    OTEL_PROPAGATORS: tracecontext,baggage
+    OTEL_PYTHON_LOG_CORRELATION: "true"
+    OTEL_PYTHON_LOG_FORMAT: "%(msg)s [span_id=%(span_id)s]"
+    OTEL_PYTHON_LOG_LEVEL: debug
+    OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: "true"
+    OTEL_LOG_LEVEL: debug
+  secretEnv:
+    DATABASE_URL: postgres://wagtail:wagtail-password@wagtail-db-postgresql/wagtail
+    DJANGO_SECRET_KEY: changeme
+  volumeMounts:
+    - name: custom-settings
+      mountPath: /app/bakerydemo/settings/custom.py
+      subPath: custom.py
+
+volumes:
+  - name: custom-settings
+    configMap:
+      name: wagtail-custom-settings
+
+nginx:
+  image:
+    repository: ghcr.io/lucasdc6/tesis-demo-apps/wagtail/nginx
+    tag: latest
+  staticMountPath: /app/bakerydemo/static
+  livenessProbe: null
+  readinessProbe: null
+
+route:
+  enabled: true
+  tracing:
+    enabled: false
+  hostnames:
+    - wagtail.localhost
+  parentRefs:
+    - name: nginx
+      namespace: nginx-gateway
+      sectionName: http

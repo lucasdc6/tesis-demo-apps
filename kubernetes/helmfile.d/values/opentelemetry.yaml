@@ -1,0 +1,83 @@
+image:
+  repository: otel/opentelemetry-collector-contrib
+
+mode: deployment
+
+ports:
+  fluent:
+    enabled: true
+    containerPort: 8006
+    servicePort: 8006
+    protocol: TCP    
+
+config:
+  receivers:
+    fluentforward:
+      endpoint: 0.0.0.0:8006
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  processors:
+    batch: {}
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 65
+      spike_limit_percentage: 20
+    filter/spans:
+      error_mode: ignore
+      traces:
+        span:
+          - IsMatch(attributes["http.target"], "^/.*health_check*")
+          - attributes["identifier"] == "text template"
+    transform/fluent_logs:
+      error_mode: ignore
+      log_statements:
+        - context: log
+          statements:
+            - set(resource.attributes["service.name"], attributes["service"])
+
+  connectors:
+    spanmetrics:
+      namespace: traces_spanmetrics
+      exemplars:
+        enabled: true
+      histogram:
+        explicit:
+          buckets: [250ms, 500ms, 750ms, 1s, 5s, 10s]
+      dimensions:
+        - name: http.method
+          default: GET
+        - name: http.status_code
+
+  exporters:
+    debug/metrics:
+      verbosity: detailed
+    debug/logs:
+      verbosity: detailed
+    debug/traces:
+      verbosity: detailed
+    otlphttp:
+      metrics_endpoint: "http://mimir-gateway.mimir/otlp/v1/metrics"
+      logs_endpoint: "http://loki-gateway.loki/otlp/v1/logs"
+      traces_endpoint: "http://tempo-gateway.tempo/otlp/v1/traces"
+      tls:
+        insecure: true
+
+  service:
+    pipelines:
+      metrics:
+        receivers: [otlp, spanmetrics]
+        processors: [memory_limiter, batch]
+        exporters: [otlphttp]
+      logs:
+        receivers: [otlp, fluentforward]
+        processors: [memory_limiter, transform/fluent_logs, batch]
+        exporters: [otlphttp, debug/logs]
+      traces:
+        receivers: [otlp]
+        processors: [memory_limiter, batch, filter/spans]
+        exporters: [otlphttp, spanmetrics]

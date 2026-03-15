@@ -1,0 +1,79 @@
+rootUser: admin
+rootPassword: admin12345
+
+mode: standalone
+
+persistence:
+  storageClass: standard
+
+resources:
+  requests:
+    memory: 2Gi
+
+buckets:
+  - name: mimir-chunks
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false
+  - name: mimir-ruler
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false
+  - name: mimir-alerts
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false
+  - name: loki-chunks
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false
+  - name: loki-ruler
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false
+  - name: tempo
+    policy: none
+    purge: false
+    versioning: false
+    objectlocking: false
+
+policies:
+  - name: mimir
+    statements:
+      - resources:
+        - 'arn:aws:s3:::mimir-*/*'
+        actions:
+        - 's3:*'
+        conditions:
+          - StringEquals: '"aws:username": "mimir"'
+  - name: loki
+    statements:
+      - resources:
+        - 'arn:aws:s3:::loki-*/*'
+        actions:
+        - 's3:*'
+        conditions:
+          - StringEquals: '"aws:username": "loki"'
+  - name: tempo
+    statements:
+      - resources:
+        - 'arn:aws:s3:::tempo/*'
+        actions:
+        - 's3:*'
+        conditions:
+          - StringEquals: '"aws:username": "tempo"'
+users:
+  - accessKey: mimir
+    secretKey: mimir12345
+    policy: mimir
+  - accessKey: loki
+    secretKey: loki12345
+    policy: loki
+  - accessKey: tempo
+    secretKey: tempo12345
+    policy: tempo

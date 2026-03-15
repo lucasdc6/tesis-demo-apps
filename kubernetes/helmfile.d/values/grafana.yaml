@@ -1,0 +1,66 @@
+---
+route:
+  main:
+    enabled: true
+    hostnames:
+      - grafana.localhost
+    parentRefs:
+      - name: nginx
+        namespace: nginx-gateway
+        sectionName: http
+
+env:
+  GF_AUTH_ANONYMOUS_ENABLED: "true"
+  GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+  GF_AUTH_DISABLE_LOGIN_FORM: "true"
+  GF_FEATURE_TOGGLES_ENABLE: "traceqlEditor traceQLStreaming metricsSummary"
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Mimir
+        uid: prom
+        type: prometheus
+        url: http://mimir-gateway.mimir/prometheus
+        isDefault: true
+        jsonData:
+          httpMethod: "POST"
+          exemplarTraceIdDestinations:
+            - datasourceUid: "tempo"
+              name: "trace_id"
+      - name: Loki
+        uid: loki
+        type: loki
+        url: http://loki-gateway.loki
+        isDefault: false
+        jsonData:
+          derivedFields:
+            - name: "trace_id"
+              matcherType: label
+              matcherRegex: trace_id
+              datasourceUid: "tempo"
+              urlDisplayLabel: "View Trace in Tempo"
+              url: "$${__value.raw}"
+              internalLink: true
+      - name: Tempo
+        uid: tempo
+        type: tempo
+        url: http://tempo-query-frontend.tempo:3200
+        isDefault: false
+        jsonData:
+          lokiSearch:
+            datasourceUid: loki
+          tracesToMetrics:
+            datasourceUid: prom
+          serviceMap:
+            datasourceUid: prom
+          httpMethod: GET
+          tracesToLogsV2:
+            datasourceUid: 'loki'
+            spanStartTimeShift: '-5m'
+            spanEndTimeShift: '5m'
+            groupFilters: []
+            customQuery: true
+            query: '{$${__tags}} | trace_id = "$${__trace.traceId}"'
+            tags: [{ key: 'service.name', value: 'service_name' }]

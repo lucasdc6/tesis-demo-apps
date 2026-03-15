@@ -66,7 +66,10 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["sh", "-c", "cp -R {{ .Values.app.staticDir }}/* /tmp/statics/"]
+                command:
+                - "sh"
+                - "-c"
+                - "{{ range .Values.app.extraPostStartCommands }}{{ . }}; {{ end }}cp -R {{ .Values.app.staticDir }}/* /tmp/statics/"
           volumeMounts:
             - name: statics
               mountPath: /tmp/statics
@@ -105,7 +108,9 @@ spec:
           {{- end }}
           volumeMounts:
             - name: statics
-              mountPath: /usr/share/nginx/html
+              mountPath: {{ .Values.nginx.staticMountPath }}
+            - name: files
+              mountPath: {{ .Values.app.fileDir }}
           {{- with .Values.nginx.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -119,7 +124,6 @@ spec:
         {{- else }}
           emptyDir: {}
         {{- end }}
-
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

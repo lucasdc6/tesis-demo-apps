@@ -1,10 +1,53 @@
 repositories:
   - name: grafana
     url: https://grafana.github.io/helm-charts
+  - name: grafana-community
+    url: https://grafana-community.github.io/helm-charts
+  - name: minio
+    url: https://charts.min.io
+  - name: bedag
+    url: https://bedag.github.io/helm-charts
+  - name: open-telemetry
+    url: https://open-telemetry.github.io/opentelemetry-helm-charts
+
 releases:
-  - name: lgtm-distributed
-    namespace: observability
-    chart: grafana/lgtm-distributed
-    version: 2.1.*
+  - name: grafana
+    namespace: grafana
+    chart: grafana-community/grafana
     values:
-      - values/lgtm-distributed.yaml
+      - values/grafana.yaml
+  - name: minio
+    namespace: minio
+    chart: minio/minio
+    values:
+      - values/minio.yaml
+  - name: minio-route
+    namespace: minio
+    chart: bedag/raw
+    values:
+      - values/minio-route.yaml
+  - name: mimir
+    namespace: mimir
+    chart: grafana/mimir-distributed
+    values:
+      - values/mimir.yaml
+    needs:
+      - minio/minio
+  - name: loki
+    namespace: loki
+    chart: grafana/loki
+    values:
+      - values/loki.yaml
+    needs:
+      - minio/minio
+  - name: tempo
+    namespace: tempo
+    chart: grafana-community/tempo-distributed
+    values:
+      - values/tempo.yaml
+  - name: opentelemetry-collector
+    namespace: opentelemetry
+    chart: open-telemetry/opentelemetry-collector
+    version: 0.146.1
+    values:
+      - values/opentelemetry.yaml

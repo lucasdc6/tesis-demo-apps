@@ -1,0 +1,31 @@
+minio:
+  enabled: false
+
+mimir:
+  structuredConfig:
+    limits:
+      max_global_exemplars_per_user: 100000
+    alertmanager_storage:
+      backend: s3
+      s3:
+        bucket_name: mimir-alerts
+        endpoint: minio.minio.svc:9000
+        access_key_id: mimir
+        secret_access_key: mimir12345
+        insecure: true
+    ruler_storage:
+      backend: s3
+      s3:
+        bucket_name: mimir-ruler
+        endpoint: minio.minio.svc:9000
+        access_key_id: mimir
+        secret_access_key: mimir12345
+        insecure: true
+    blocks_storage:
+      backend: s3
+      s3:
+        bucket_name: mimir-chunks
+        endpoint: minio.minio.svc:9000
+        access_key_id: mimir
+        secret_access_key: mimir12345
+        insecure: true
