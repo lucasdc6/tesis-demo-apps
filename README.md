@@ -1,80 +1,171 @@
 # Aplicaciones demo
 
-En este repositorio se van a encontrar todos los archivos usados para realizar
-las pruebas de la tesis "Observabilidad, una base para aplicaciones resilientes"
+Repositorio de la PoC de la tesis **"Observabilidad, una base para aplicaciones resilientes"**.
 
-## Requerimeintos
+El objetivo es demostrar cómo instrumentar con OpenTelemetry tres aplicaciones preexistentes,
+desarrolladas en lenguajes y frameworks distintos, sin modificar su código fuente, y centralizar
+sus señales de telemetría (trazas, métricas y logs) en un stack de observabilidad unificado.
 
-Para poner en funcionamiento las demos, es necesario contar con
+## Qué incluye
 
-- docker
-- docker compose
+### Aplicaciones instrumentadas
 
-## Iniciar ambiente
+| Aplicación | Lenguaje | Framework | Instrumentación |
+|------------|----------|-----------|-----------------|
+| WordPress  | PHP 8.3  | —         | Automática (extensión PECL + Composer) |
+| Redmine    | Ruby     | Rails     | Manual (SDK + `opentelemetry-instrumentation-all`) |
+| Wagtail    | Python 3.9 | Django  | Automática (`opentelemetry-instrument`) |
 
-El ambiente de las pruebas se encuentra dividido en diferentes archivos
-`docker compose` que se pueden encontrar en el directorio `compose_files`
+### Stack de observabilidad
 
-- `docker-compose.yaml`: Archivo principal que cuenta con todos los servicios
-  base necesarios para la ejecución de las pruebas, tales como
-  - Una base de datos `mysql`.
-  - Un `nginx` que funciona a modo de reverse proxy para simplificar el acceso a
-    los servicios.
-  - Un colector de `opentelemetry` que va a recibir todos los datos y los va a
-    insertar en la base de datos adecuada.
-  - Un `grafana` que va a permitir visualizar la información.
-  - Una base de datos `mimir` para almacenar métricas.
-  - Una base de datos `loki` para almacenar logs, junto a un servicio para
-    configurar los permisos de su filesystem.
-  - Una base de datos `tempo` para almacenar trazas, junto a un servicio para
-    configurar los permisos de su filesystem.
-- `docker-compose.wordpress.yaml`: Archivo del servicio `wordpress`, cuenta con
-  2 servicios, el principal que levanta un `php-fpm` y un `nginx` que sirve
-  tanto los estáticos y que envía todos los requerimientos php al servicio de
-  `wordpress` mediante el protocolo `fastcgi`.
-- `docker-compose.redmine.yaml`: Archivo del servicio de `redmine`, cuenta con 2
-  servicios, el principal que levanta un application server `puma`, y un `nginx`
-  que sirve tanto los estáticos y proxea los requerimeintos de `redmine` al
-  servidor `puma` mediante `proxy_pass`.
-- `docker-compose.wagtail.yaml`: Archivo del servicio de `wagtail`, cuenta con 2
-  servicios, el principal que levanta un application server `uWSGI`, y un `nginx`
-  que sirve tanto los estáticos y proxea los requerimeintos de `wagtail` al
-  servidor `uWSGI` mediante `proxy_pass`.
+- **OpenTelemetry Collector** — recibe las señales de todas las aplicaciones (OTLP HTTP/gRPC y Fluentd) y las enruta a los backends.
+- **Mimir** — almacenamiento de métricas (compatible con Prometheus).
+- **Loki** — almacenamiento de logs.
+- **Tempo** — almacenamiento de trazas distribuidas.
+- **Grafana** — visualización unificada de las tres señales.
 
-Para iniciar los servicios base, ejecutar
+### Estructura del repositorio
+
+```
+├── bin/                    # Scripts para gestionar el ambiente (service-run, service-stop, etc.)
+├── compose_files/          # Archivos Docker Compose por servicio
+├── container_files/        # Containerfiles multi-stage para cada aplicación
+├── etc/                    # Configuración de servicios
+│   ├── grafana/            #   Datasources, Mimir, Loki, Tempo, Alertmanager
+│   ├── mysql/              #   Script de inicialización de bases de datos
+│   ├── nginx/              #   Templates de configuración del LB y proxies por app
+│   ├── otel/               #   Pipeline del OpenTelemetry Collector
+│   ├── php/                #   Extensión OTel, composer.json para WordPress
+│   ├── python/             #   Dependencias y configuración para Wagtail
+│   └── ruby/               #   Gemfile, initializer OTel y config de logs para Redmine
+├── data/                   # Salida JSON del OTel Collector (generada en runtime)
+├── helm/                   # Helm chart genérico para desplegar las apps en Kubernetes
+└── kubernetes/             # Config de cluster Kind y releases con Helmfile
+```
+
+## Requisitos
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+> Los scripts en `bin/` se agregan automáticamente al `PATH` si se usa [direnv](https://direnv.net/) con el `.envrc` incluido.
+
+## Iniciar el ambiente
+
+Los servicios se gestionan con los scripts del directorio `bin/`. El argumento puede ser
+`base`, `wordpress`, `redmine`, `wagtail` o `all` (también se aceptan las abreviaciones
+`b`, `wp`, `r`, `wt`).
+
+**1. Iniciar la infraestructura base** (obligatorio, debe ejecutarse primero):
 
 ```bash
 ./bin/service-run base
 ```
 
-Luego, podemos levantar las demo ejecutando
+Esto levanta el colector de OpenTelemetry, Grafana, Mimir, Loki, Tempo y el proxy Nginx.
+
+**2. Levantar una o más aplicaciones demo:**
 
 ```bash
-./bin/service-run <DEMO>
-
-# Por ejemplo, para levantar wordpress
 ./bin/service-run wordpress
+./bin/service-run redmine
+./bin/service-run wagtail
 ```
 
-Alternmativamente, podemos ejecutar todos los servicios con un solo comando
+O todas a la vez:
 
 ```bash
 ./bin/service-run all
 ```
 
-Luego, para eliminar todos los recursos creados por docker, ejecutar
+## URLs de acceso
+
+Una vez levantado el ambiente:
+
+| Servicio   | URL                          |
+|------------|------------------------------|
+| Grafana    | http://grafana.localhost     |
+| WordPress  | http://wordpress.localhost   |
+| Redmine    | http://redmine.localhost     |
+| Wagtail    | http://wagtail.localhost     |
+
+> Grafana está configurado con acceso anónimo en rol de administrador. No requiere login.
+
+## Destruir el ambiente
 
 ```bash
 ./bin/service-stop all
 ```
 
-> Notar que el flag `-v` va a borrar los volumenes
+> **Atención**: este comando ejecuta `docker compose down -v`, por lo que elimina los contenedores
+> **y todos los volúmenes** asociados (bases de datos, datos de Mimir/Loki/Tempo, etc.).
+> Los datos generados no son recuperables luego de ejecutarlo.
 
-## Inspeccionar el ambiente
+Para detener únicamente una aplicación específica sin afectar el resto:
 
-Una vez levantado el ambiente, podemos acceder a las siguientes URLs
+```bash
+./bin/service-stop wordpress
+```
 
-- http://grafana.localhost
-- http://wordpress.localhost
-- http://redmine.localhost
-- http://wagtail.localhost
+## Otros comandos
+
+```bash
+# Reconstruir las imágenes de contenedor
+./bin/service-build <DEMO>
+
+# Ver logs en tiempo real
+./bin/service-logs <DEMO>
+```
+
+## Estresar las aplicaciones con Locust
+
+El directorio `locust/` contiene archivos de prueba de carga para cada aplicación:
+
+| Archivo             | Aplicación                              |
+|---------------------|-----------------------------------------|
+| `locust/wordpress.py` | WordPress                             |
+| `locust/redmine.py`   | Redmine                               |
+| `locust/wagtail.py`   | Wagtail                               |
+| `locust/all.py`       | Las tres aplicaciones simultáneamente |
+
+No hace falta instalar Locust: se puede correr directamente con Docker.
+
+### Estresar una aplicación individual
+
+```bash
+docker run --rm \
+  --network=host \
+  -v $(pwd)/locust:/mnt/locust \
+  locustio/locust \
+  -f /mnt/locust/wordpress.py \
+  --host=http://wordpress.localhost
+```
+
+Reemplazar `wordpress.py` y `wordpress.localhost` por la aplicación deseada.
+Luego abrir http://localhost:8089 para configurar la cantidad de usuarios y arrancar la prueba.
+
+### Estresar las tres aplicaciones a la vez
+
+```bash
+docker run --rm \
+  --network=host \
+  -v $(pwd)/locust:/mnt/locust \
+  locustio/locust \
+  -f /mnt/locust/all.py
+```
+
+`all.py` define un host por clase de usuario, por lo que no es necesario especificar `--host`.
+
+### Modo headless (sin interfaz web)
+
+```bash
+docker run --rm \
+  --network=host \
+  -v $(pwd)/locust:/mnt/locust \
+  locustio/locust \
+  -f /mnt/locust/all.py \
+  --headless \
+  --users 20 \
+  --spawn-rate 5 \
+  --run-time 2m
+```
