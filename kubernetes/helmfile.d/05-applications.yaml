@@ -12,7 +12,7 @@ releases:
     namespace: redmine
     chart: jitterbit/dockerconfigjson
     version: 1.0.*
-    values:
+    secrets:
       - values/github-registry.yaml
   - name: redmine-db
     namespace: redmine
@@ -35,7 +35,7 @@ releases:
     namespace: wordpress
     chart: jitterbit/dockerconfigjson
     version: 1.0.*
-    values:
+    secrets:
       - values/github-registry.yaml
   - name: wordpress-db
     namespace: wordpress
@@ -58,7 +58,7 @@ releases:
     namespace: wagtail
     chart: jitterbit/dockerconfigjson
     version: 1.0.*
-    values:
+    secrets:
       - values/github-registry.yaml
   - name: wagtail-db
     namespace: wagtail
