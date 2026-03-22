@@ -10,7 +10,7 @@ RUN pecl install opentelemetry protobuf redis ;\
       opentelemetry.so \
       protobuf.so \
       redis.so
-COPY etc/php/* $PHP_INI_DIR/conf.d/.
+COPY etc/php/*.php.ini $PHP_INI_DIR/conf.d/.
 COPY --from=build /app/vendor /var/www/otel
 ENV OTEL_AUTOLOAD_PATH=/var/www/otel/autoload.php \
     WORDPRESS_SESSION_HANDLER="files"

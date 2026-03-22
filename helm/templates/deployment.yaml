@@ -66,6 +66,7 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.app.staticDir }}
           lifecycle:
             postStart:
               exec:
@@ -73,9 +74,12 @@ spec:
                 - "sh"
                 - "-c"
                 - "{{ range .Values.app.extraPostStartCommands }}{{ . }}; {{ end }}cp -R {{ .Values.app.staticDir }}/* /tmp/statics/"
+          {{- end }}
           volumeMounts:
+            {{- if .Values.app.staticDir }}
             - name: statics
               mountPath: /tmp/statics
+            {{- end }}
             - name: files
               mountPath: {{ .Values.app.fileDir }}
           {{- with .Values.app.volumeMounts }}
@@ -110,16 +114,20 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{- if .Values.app.staticDir }}
             - name: statics
               mountPath: {{ .Values.nginx.staticMountPath }}
+            {{- end }}
             - name: files
               mountPath: {{ .Values.app.fileDir }}
           {{- with .Values.nginx.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
+        {{- if .Values.app.staticDir }}
         - name: statics
           emptyDir: {}
+        {{- end }}
         - name: files
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

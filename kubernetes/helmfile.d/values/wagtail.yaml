@@ -3,11 +3,6 @@ fullnameOverride: wagtail
 imagePullSecrets:
   - name: github-registry
 
-persistence:
-  enabled: true
-  size: 5Gi
-  storageClass: nfs
-
 app:
   image:
     repository: ghcr.io/lucasdc6/tesis-demo-apps/wagtail/app
@@ -29,7 +24,7 @@ app:
     - name: DATABASE_URL
       value: postgres://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
   env:
-    REDIS_URL: redis://redmine-redis-valkey/0
+    REDIS_URL: redis://wagtail-redis-valkey/0
     DJANGO_SETTINGS_MODULE: bakerydemo.settings.custom
     OTEL_SERVICE_NAME: wagtail-demo
     OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
@@ -46,6 +41,12 @@ app:
   secretEnv:
     DATABASE_PASSWORD: wagtail-password
     DJANGO_SECRET_KEY: changeme
+
+persistence:
+  enabled: true
+  size: "5Gi"
+  accessMode: ReadWriteMany
+  storageClass: nfs
 
 nginx:
   image:

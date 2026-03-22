@@ -8,12 +8,19 @@ app:
     repository: ghcr.io/lucasdc6/tesis-demo-apps/wordpress/app
     tag: latest
   port: 9000
-  staticDir: /var/www/html
-  fileDir: /var/www/html/wp-content/uploads
-  extraPostStartCommands:
-    - sleep 5
+  fileDir: /var/www/html
   migrations:
     enabled: false
+  init:
+    enabled: true
+    image:
+      repository: wordpress
+      tag: cli-2.12.0-php8.3
+    command:
+      - sh
+      - -c
+    args:
+      - 'wp core install --url="$WORDPRESS_URL" --title="$WORDPRESS_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" --skip-email'
   livenessProbe: null
   readinessProbe: null
   env:
@@ -24,6 +31,9 @@ app:
     WORDPRESS_CONFIG_EXTRA: |
       define('WP_DEBUG_LOG', '/dev/stderr');
       define('WP_DEBUG_DISPLAY', false);
+    WORDPRESS_TITLE: "Wordpress Demo"
+    WORDPRESS_ADMIN_USER: demo
+    WORDPRESS_URL: http://wordpress.localhost
     # OTel auto instrumentation config
     # https://opentelemetry.io/docs/instrumentation/php/automatic/#installation
     OTEL_PHP_AUTOLOAD_ENABLED: "true"
@@ -34,12 +44,27 @@ app:
     OTEL_LOGS_EXPORTER: otlp
   secretEnv:
     WORDPRESS_DB_PASSWORD: wordpress-password
+    WORDPRESS_AUTH_KEY: "random-key"
+    WORDPRESS_SECURE_AUTH_KEY: "random-key"
+    WORDPRESS_LOGGED_IN_KEY: "random-key"
+    WORDPRESS_NONCE_KEY: "random-key"
+    WORDPRESS_AUTH_SALT: "random-key"
+    WORDPRESS_SECURE_AUTH_SALT: "random-key"
+    WORDPRESS_LOGGED_IN_SALT: "random-key"
+    WORDPRESS_NONCE_SALT: "random-key"
+    WORDPRESS_ADMIN_PASSWORD: demo
+    WORDPRESS_ADMIN_EMAIL: demo@example.com
+
+persistence:
+  enabled: true
+  size: "5Gi"
+  accessMode: ReadWriteMany
+  storageClass: nfs
 
 nginx:
   image:
     repository: ghcr.io/lucasdc6/tesis-demo-apps/wordpress/nginx
     tag: latest
-  staticMountPath: /var/www/html
 
 route:
   enabled: true

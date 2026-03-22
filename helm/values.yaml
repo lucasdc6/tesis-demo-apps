@@ -19,6 +19,17 @@ app:
     args: []
     volumeMounts: []
     volumes: []
+  init:
+    enabled: false
+    image:
+      repository: ""
+      pullPolicy: IfNotPresent
+      tag: ""
+    extraEnvs: {}
+    command: []
+    args: []
+    volumeMounts: []
+    volumes: []
   port: ""
   staticDir: ""
   fileDir: ""

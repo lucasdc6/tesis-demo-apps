@@ -1,0 +1,68 @@
+{{- if .Values.app.init.enabled }}
+{{- if not .Values.app.init.args }}
+{{- fail "You must specify the init command at '.app.init.args'" }}
+{{- end }}
+apiVersion: batch/v1
+kind: Job
+metadata: 
+  name: {{ include "application.fullname" . }}-init-{{ randNumeric 5 }}
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: init
+          image: "{{ .Values.app.init.image.repository | default .Values.app.image.repository }}:{{ coalesce .Values.app.init.image.tag .Values.app.image.tag .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          {{- with .Values.app.extraEnvs }}
+          env: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "application.fullname" . }}
+            - secretRef:
+                name: {{ include "application.fullname" . }}
+          {{- with .Values.app.init.extraEnvs }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.app.init.command }}
+          command:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.app.init.args }}
+          args:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: files
+              mountPath: {{ .Values.app.fileDir }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: files
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "application.fullname" . }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+{{- end }}
