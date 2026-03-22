@@ -25,8 +25,11 @@ app:
     volumes:
   livenessProbe: null
   readinessProbe: null
+  extraEnvs:
+    - name: DATABASE_URL
+      value: postgres://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
   env:
-    REDIS_URL: redis://redis
+    REDIS_URL: redis://redmine-redis-valkey/0
     DJANGO_SETTINGS_MODULE: bakerydemo.settings.custom
     OTEL_SERVICE_NAME: wagtail-demo
     OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
@@ -37,18 +40,12 @@ app:
     OTEL_PYTHON_LOG_LEVEL: debug
     OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: "true"
     OTEL_LOG_LEVEL: debug
+    DATABASE_USERNAME: wagtail
+    DATABASE_NAME: wagtail
+    DATABASE_HOST: wagtail-db-cluster-rw
   secretEnv:
-    DATABASE_URL: postgres://wagtail:wagtail-password@wagtail-db-postgresql/wagtail
+    DATABASE_PASSWORD: wagtail-password
     DJANGO_SECRET_KEY: changeme
-  volumeMounts:
-    - name: custom-settings
-      mountPath: /app/bakerydemo/settings/custom.py
-      subPath: custom.py
-
-volumes:
-  - name: custom-settings
-    configMap:
-      name: wagtail-custom-settings
 
 nginx:
   image:

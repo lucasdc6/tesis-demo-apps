@@ -17,7 +17,7 @@ app:
   livenessProbe: null
   readinessProbe: null
   env:
-    WORDPRESS_DB_HOST: wordpress-db-mysql
+    WORDPRESS_DB_HOST: wordpress-db-mysql-cluster-db-mysql
     WORDPRESS_DB_NAME: wordpress
     WORDPRESS_DB_USER: wordpress
     WORDPRESS_DEBUG: "true"

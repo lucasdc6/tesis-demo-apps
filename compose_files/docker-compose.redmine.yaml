@@ -10,7 +10,7 @@ networks:
 
 services:
   redmine: &redmine
-    image: redmine
+    image: ghcr.io/lucasdc6/tesis-demo-apps/redmine/app
     build:
       context: ..
       dockerfile: container_files/Containerfile.redmine
@@ -42,7 +42,7 @@ services:
       - observability
 
   redmine-nginx:
-    image: redmine-nginx
+    image: ghcr.io/lucasdc6/tesis-demo-apps/redmine/nginx
     build:
       context: ..
       dockerfile: container_files/Containerfile.redmine

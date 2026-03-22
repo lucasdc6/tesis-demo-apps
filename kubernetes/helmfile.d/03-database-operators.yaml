@@ -1,0 +1,14 @@
+repositories:
+  - name: bitpoke
+    url: https://helm-charts.bitpoke.io
+  - name: cnpg
+    url: https://cloudnative-pg.github.io/charts
+releases:
+  - name: mysql-operator
+    namespace: mysql-operator
+    chart: bitpoke/mysql-operator
+    version: 0.6.*
+  - name: cnpg
+    namespace: cnpg
+    chart: cnpg/cloudnative-pg
+    version: 0.27.*

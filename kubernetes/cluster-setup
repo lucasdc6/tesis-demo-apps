@@ -27,7 +27,7 @@ die()     { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 header()  { echo -e "\n${BOLD}==> $*${NC}"; }
 
 usage() {
-  cat <<EOF
+  echo -e "
 ${BOLD}cluster-setup${NC} — gestiona el cluster Kind para la PoC de observabilidad
 
 ${BOLD}USO${NC}
@@ -40,8 +40,7 @@ ${BOLD}COMANDOS${NC}
 
 ${BOLD}REQUISITOS${NC}
   kind · kubectl · helm · helmfile
-
-EOF
+"
 }
 
 # ---------------------------------------------------------------------------
@@ -107,29 +106,43 @@ install_infra() {
   header "Instalando infraestructura con helmfile"
   cd "$SCRIPT_DIR"
 
-  info "1/3 — ingress-nginx"
-  helmfile --file helmfile.d/01-ingress-nginx.yaml apply --suppress-diff
+  info "1/5 — gateway-api"
+  helmfile --file helmfile.d/01-gateway-api.yaml apply --suppress-diff
 
-  info "Esperando que ingress-nginx esté listo..."
-  kubectl wait --namespace ingress-nginx \
+  info "Esperando que gateway-api esté listo..."
+  kubectl wait --namespace nginx-gateway \
     --for=condition=ready pod \
-    --selector=app.kubernetes.io/component=controller \
+    --selector=gateway.networking.k8s.io/gateway-name=nginx \
     --timeout=120s
-  ok "ingress-nginx listo"
+  ok "gateway-api listo"
 
-  info "2/3 — KEDA"
+  info "2/5 — KEDA"
   helmfile --file helmfile.d/02-keda.yaml apply --suppress-diff
   ok "KEDA instalado"
 
-  info "3/3 — Stack LGTM (Loki · Grafana · Tempo · Mimir)"
-  helmfile --file helmfile.d/03-observability.yaml apply --suppress-diff
+  info "3/5 — Database operators"
+  helmfile --file helmfile.d/03-database-operators.yaml apply --suppress-diff
+  ok "Database operators instalados"
+
+  info "4/5 — Stack LGTM (Loki · Grafana · Tempo · Mimir)"
+  helmfile --file helmfile.d/04-observability.yaml apply --suppress-diff
 
   info "Esperando que Grafana esté listo (puede tardar ~2 min)..."
-  kubectl wait --namespace observability \
+  kubectl wait --namespace grafana \
     --for=condition=ready pod \
     --selector=app.kubernetes.io/name=grafana \
     --timeout=300s
   ok "Stack LGTM listo"
+
+  info "4/5 — Ganesha NFS"
+  helmfile --file helmfile.d/05-ganesha-nfs.yaml apply --suppress-diff
+
+  info "Esperando que Ganesha NFS esté listo (puede tardar ~2 min)..."
+  kubectl wait --namespace ganesha-nfs \
+    --for=condition=ready pod \
+    --selector=app=nfs-server-provisioner \
+    --timeout=300s
+  ok "Ganesha NFS listo"
 }
 
 # ---------------------------------------------------------------------------

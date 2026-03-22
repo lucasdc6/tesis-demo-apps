@@ -1,8 +1,4 @@
-image:
-  repository: bitnamilegacy/mysql
-  tag: 8.4.5-debian-12-r0
-
-auth:
-  database: wordpress
-  username: wordpress
-  password: wordpress-password
+rootPassword: wordpress-root-password
+appDatabase: wordpress
+appUser: wordpress
+appPassword: wordpress-password

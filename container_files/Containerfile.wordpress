@@ -5,13 +5,15 @@ RUN composer install --ignore-platform-reqs
 
 # Instalacion de wordpress
 FROM wordpress:6.5.4-php8.3-fpm AS wordpress
-RUN pecl install opentelemetry protobuf ;\
+RUN pecl install opentelemetry protobuf redis ;\
     docker-php-ext-enable \
       opentelemetry.so \
-      protobuf.so
-COPY etc/php/otel.php.ini $PHP_INI_DIR/conf.d/.
+      protobuf.so \
+      redis.so
+COPY etc/php/* $PHP_INI_DIR/conf.d/.
 COPY --from=build /app/vendor /var/www/otel
-ENV OTEL_AUTOLOAD_PATH=/var/www/otel/autoload.php
+ENV OTEL_AUTOLOAD_PATH=/var/www/otel/autoload.php \
+    WORDPRESS_SESSION_HANDLER="files"
 
 FROM nginx:1.26.0 AS nginx
 

@@ -1,8 +1,14 @@
 repositories:
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami
+  - name: bedag
+    url: https://bedag.github.io/helm-charts
+  - name: bitpoke
+    url: https://helm-charts.bitpoke.io
+  - name: cnpg
+    url: https://cloudnative-pg.github.io/charts
   - name: jitterbit
     url: https://jitterbit.github.io/charts
+  - name: valkey
+    url: https://valkey.io/valkey-helm
 
 releases:
   ##################
@@ -16,8 +22,8 @@ releases:
       - values/github-registry.yaml
   - name: redmine-db
     namespace: redmine
-    chart: bitnami/mysql
-    version: 14.0.*
+    chart: bitpoke/mysql-cluster
+    version: 0.6.*
     values:
       - values/redmine-db.yaml
   - name: redmine
@@ -39,8 +45,8 @@ releases:
       - values/github-registry.yaml
   - name: wordpress-db
     namespace: wordpress
-    chart: bitnami/mysql
-    version: 14.0.*
+    chart: bitpoke/mysql-cluster
+    version: 0.6.*
     values:
       - values/wordpress-db.yaml
   - name: wordpress
@@ -62,16 +68,13 @@ releases:
       - values/github-registry.yaml
   - name: wagtail-db
     namespace: wagtail
-    chart: bitnami/postgresql
-    version: 18.0.*
+    chart: bedag/raw
     values:
       - values/wagtail-db.yaml
   - name: wagtail-redis
     namespace: wagtail
-    chart: bitnami/redis
-    version: 24.1.*
-    values:
-      - values/wagtail-redis.yaml
+    chart: valkey/valkey
+    version: 0.9.*
   - name: wagtail
     namespace: wagtail
     chart: ../../helm

@@ -11,7 +11,7 @@ networks:
 
 services:
   wagtail: &wagtail
-    image: wagtail
+    image: ghcr.io/lucasdc6/tesis-demo-apps/wagtail/app
     build:
       context: ..
       dockerfile: container_files/Containerfile.wagtail
@@ -46,7 +46,7 @@ services:
       - observability
 
   wagtail-nginx:
-    image: wagtail-nginx
+    image: ghcr.io/lucasdc6/tesis-demo-apps/wagtail/nginx
     build:
       context: ..
       dockerfile: container_files/Containerfile.wagtail

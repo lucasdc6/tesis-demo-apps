@@ -22,6 +22,9 @@ spec:
         - name: migrations
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          {{- with .Values.app.extraEnvs }}
+          env: {{ toYaml . | nindent 12 }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "application.fullname" . }}

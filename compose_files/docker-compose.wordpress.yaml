@@ -9,7 +9,7 @@ networks:
 
 services:
   wordpress:
-    image: wordpress
+    image: ghcr.io/lucasdc6/tesis-demo-apps/wordpress/app
     build:
       context: ..
       dockerfile: container_files/Containerfile.wordpress
@@ -40,7 +40,7 @@ services:
       - observability
 
   wordpress-nginx:
-    image: wordpress-nginx
+    image: ghcr.io/lucasdc6/tesis-demo-apps/wordpress/nginx
     build:
       context: ..
       dockerfile: container_files/Containerfile.wordpress
