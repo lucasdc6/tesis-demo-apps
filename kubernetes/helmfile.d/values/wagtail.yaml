@@ -18,8 +18,6 @@ app:
     args:
       - wagtail-migrate
     volumes:
-  livenessProbe: null
-  readinessProbe: null
   extraEnvs:
     - name: DATABASE_URL
       value: postgres://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
@@ -39,6 +37,18 @@ app:
   secretEnv:
     DATABASE_PASSWORD: wagtail-password
     DJANGO_SECRET_KEY: changeme
+  livenessProbe:
+    tcpSocket:
+      port: app
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 4
+  readinessProbe:
+    tcpSocket:
+      port: app
+    initialDelaySeconds: 5
+    periodSeconds: 15
+    timeoutSeconds: 4
 
 persistence:
   enabled: true
@@ -64,3 +74,13 @@ route:
     - name: nginx
       namespace: nginx-gateway
       sectionName: http
+
+autoscaling:
+  enabled: true
+  prometheusServerAddr: http://mimir-gateway.mimir.svc/prometheus
+  query: >
+    sum(
+      rate(
+        traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
+      )
+    )

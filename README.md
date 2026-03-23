@@ -82,12 +82,12 @@ O todas a la vez:
 
 Una vez levantado el ambiente:
 
-| Servicio   | URL                          |
-|------------|------------------------------|
-| Grafana    | http://grafana.localhost     |
-| WordPress  | http://wordpress.localhost   |
-| Redmine    | http://redmine.localhost     |
-| Wagtail    | http://wagtail.localhost     |
+| Servicio   | URL                          | Credenciales   |
+|------------|------------------------------|----------------|
+| Grafana    | http://grafana.localhost     | N/A            |
+| WordPress  | http://wordpress.localhost   | admin/admin    |
+| Redmine    | http://redmine.localhost     | admin/admin    |
+| Wagtail    | http://wagtail.localhost     | admin/changeme |
 
 > Grafana está configurado con acceso anónimo en rol de administrador. No requiere login.
 

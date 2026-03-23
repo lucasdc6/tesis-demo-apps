@@ -10,6 +10,9 @@ app:
   port: 3000
   staticDir: /usr/src/redmine/public
   fileDir: /usr/src/redmine/files
+  migrations:
+    args:
+      - redmine-migrate
   env:
     REDIS_URL: "redis://redmine-redis-valkey/0"
     REDMINE_DB_MYSQL: redmine-db-mysql-cluster-db-mysql
@@ -22,9 +25,6 @@ app:
   secretEnv:
     REDMINE_DB_PASSWORD: redmine-password
     REDMINE_SECRET_KEY_BASE: "10f4e6ef0ebed745be6889fd22931d119f6017a57864142912b739090561c17d48b19c370b90090c"
-  migrations:
-    args:
-      - redmine-migrate
   livenessProbe:
     httpGet:
       path: /health_check/site
