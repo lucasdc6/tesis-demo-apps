@@ -9,7 +9,8 @@
 set -euo pipefail
 
 CLUSTER_NAME="demo-apps"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../kubernetes"
+echo $SCRIPT_DIR
 KUBECONFIG_PATH="$SCRIPT_DIR/.kube/config"
 export KUBECONFIG="$KUBECONFIG_PATH"
 
