@@ -4,7 +4,7 @@ COPY etc/php/composer.json ./
 RUN composer install --ignore-platform-reqs
 
 # Instalacion de wordpress
-FROM wordpress:6.5.4-php8.3-fpm AS wordpress
+FROM wordpress:6.9.4-php8.3-fpm AS wordpress
 RUN pecl install opentelemetry protobuf redis ;\
     docker-php-ext-enable \
       opentelemetry.so \

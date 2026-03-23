@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bookworm AS wagtail
+FROM python:3.13-slim-bookworm AS wagtail
 
 WORKDIR /app
 ENV VIRTUAL_ENV=/venv \
@@ -33,10 +33,10 @@ RUN set -ex \
     zlib1g-dev \
   " \
   && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
-  && git clone --depth 1 --branch v5.1 https://github.com/wagtail/bakerydemo.git /app
+  && git clone --depth 1 --branch v6.4 https://github.com/wagtail/bakerydemo.git /app
 
 COPY etc/python/requirements.txt requirements.txt
-RUN python3.9 -m venv ${VIRTUAL_ENV} \
+RUN python3.13 -m venv ${VIRTUAL_ENV} \
   && pip install -U pip \
   && pip install --no-cache-dir -r requirements.txt \
   && opentelemetry-bootstrap -a install \

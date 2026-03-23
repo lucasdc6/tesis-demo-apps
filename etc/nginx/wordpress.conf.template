@@ -39,7 +39,7 @@ server {
     return 404;
   }
 
-  location ~ (/vendor/|/node_modules/|composer\.json|/readme|/README|readme\.txt|/upgrade\.txt|db/install\.xml|/fixtures/|/behat/|phpunit\.xml|\.lock|environment\.xml|doesnotexist) {
+  location ~ (/node_modules/|composer\.json|/readme|/README|readme\.txt|/upgrade\.txt|db/install\.xml|/fixtures/|/behat/|phpunit\.xml|\.lock|environment\.xml|doesnotexist) {
     deny all;
     return 404;
   }
