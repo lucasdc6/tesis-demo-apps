@@ -1,15 +1,6 @@
-repositories:
-  - name: grafana
-    url: https://grafana.github.io/helm-charts
-  - name: grafana-community
-    url: https://grafana-community.github.io/helm-charts
-  - name: minio
-    url: https://charts.min.io
-  - name: bedag
-    url: https://bedag.github.io/helm-charts
-  - name: open-telemetry
-    url: https://open-telemetry.github.io/opentelemetry-helm-charts
-
+bases:
+  - ./bases/repositories.yaml
+---
 releases:
   - name: grafana
     namespace: grafana
@@ -45,6 +36,12 @@ releases:
     chart: grafana-community/tempo-distributed
     values:
       - values/tempo.yaml
+  - name: kube-state-metrics
+    namespace: kube-state-metrics
+    chart: prometheus-community/kube-state-metrics
+    version: 7.2.*
+    values:
+      - values/kube-state-metrics.yaml
   - name: opentelemetry-collector
     namespace: opentelemetry
     chart: open-telemetry/opentelemetry-collector

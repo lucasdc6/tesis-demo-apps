@@ -20,6 +20,15 @@ config:
           endpoint: 0.0.0.0:4317
         http:
           endpoint: 0.0.0.0:4318
+    prometheus:
+      config:
+        scrape_configs:
+        - job_name: kubernetes-service-endpoints
+          scrape_interval: 30s
+          static_configs:
+          - targets:
+              - kube-state-metrics.kube-state-metrics:8080
+
 
   processors:
     batch: {}
@@ -70,7 +79,7 @@ config:
   service:
     pipelines:
       metrics:
-        receivers: [otlp, spanmetrics]
+        receivers: [otlp, spanmetrics, prometheus]
         processors: [memory_limiter, batch]
         exporters: [otlphttp]
       logs:

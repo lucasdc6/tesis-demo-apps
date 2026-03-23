@@ -1,6 +1,5 @@
-repositories:
-  - name: ganesha-nfs
-    url: https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/
+bases:
+  - ./bases/repositories.yaml
 ---
 releases:
   - name: ganesha-nfs

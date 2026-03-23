@@ -1,6 +1,6 @@
-repositories:
-  - name: kedacore
-    url: https://kedacore.github.io/charts
+bases:
+  - ./bases/repositories.yaml
+---
 releases:
   - name: keda
     namespace: keda

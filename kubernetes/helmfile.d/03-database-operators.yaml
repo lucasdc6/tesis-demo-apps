@@ -1,8 +1,6 @@
-repositories:
-  - name: bitpoke
-    url: https://helm-charts.bitpoke.io
-  - name: cnpg
-    url: https://cloudnative-pg.github.io/charts
+bases:
+  - ./bases/repositories.yaml
+---
 releases:
   - name: mysql-operator
     namespace: mysql-operator
