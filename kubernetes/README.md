@@ -9,17 +9,23 @@ por un Helm chart genérico.
 
 ## Qué se despliega
 
-El script `cluster-setup` crea el cluster e instala tres componentes de infraestructura
-mediante Helmfile:
+La infraestructura se instala con Helmfile en cinco capas:
 
-| Componente | Namespace | Chart | Descripción |
-|------------|-----------|-------|-------------|
-| ingress-nginx | `ingress-nginx` | `ingress-nginx/ingress-nginx` v4.10 | Ingress controller para exponer los servicios en `*.localhost` |
-| KEDA | `keda` | `kedacore/keda` v2.18 | Escalado automático basado en métricas externas |
-| LGTM Distributed | `observability` | `grafana/lgtm-distributed` v2.1 | Stack completo: Loki + Grafana + Tempo + Mimir |
+| Helmfile | Componente | Namespace(s) | Chart(s) | Descripción |
+|----------|------------|--------------|----------|-------------|
+| `01-gateway-api.yaml` | Gateway API + nginx-gateway-fabric | `nginx-gateway` | `nginx/nginx-gateway-fabric` v2.4 | Gateway para exponer los servicios en `*.localhost` |
+| `02-keda.yaml` | KEDA | `keda` | `kedacore/keda` v2.19 | Escalado automático basado en métricas externas |
+| `03-database-operators.yaml` | Operadores de BD | `mysql-operator`, `cnpg` | `bitpoke/mysql-operator` v0.6, `cnpg/cloudnative-pg` v0.27 | Gestión de clusters MySQL y PostgreSQL |
+| `04-observability.yaml` | Stack LGTM | `grafana`, `mimir`, `loki`, `tempo`, `minio`, `opentelemetry`, `kube-state-metrics` | grafana, mimir-distributed, loki, tempo-distributed, minio, otel-collector | Observabilidad completa: métricas, logs y trazas |
+| `05-ganesha-nfs.yaml` | Ganesha NFS | `ganesha-nfs` | `ganesha-nfs/nfs-server-provisioner` v1.8 | Provisioner de almacenamiento NFS para PVCs compartidos |
 
-Las aplicaciones demo (WordPress, Redmine, Wagtail) se despliegan por separado usando el
-Helm chart genérico ubicado en [`../helm/`](../helm/).
+Las aplicaciones demo (WordPress, Redmine, Wagtail) se despliegan por separado con `06-applications.yaml`:
+
+| Release | Namespace | BD | Descripción |
+|---------|-----------|----|-------------|
+| `wordpress` | `wordpress` | MySQL (bitpoke/mysql-cluster) | WordPress + Nginx sidecar |
+| `redmine` | `redmine` | MySQL (bitpoke/mysql-cluster) | Redmine + Nginx sidecar |
+| `wagtail` | `wagtail` | PostgreSQL (CNPG) + Redis (Valkey) | Wagtail + Nginx sidecar |
 
 ## Requisitos
 
@@ -29,6 +35,14 @@ Helm chart genérico ubicado en [`../helm/`](../helm/).
 | [kubectl](https://kubernetes.io/docs/tasks/tools/) | Gestor de paquetes del SO |
 | [helm](https://helm.sh/docs/intro/install/) | `curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \| bash` |
 | [helmfile](https://helmfile.readthedocs.io/en/latest/#installation) | `brew install helmfile` / binario en releases |
+| [sops](https://github.com/getsops/sops) | Para descifrar los secrets de los registries privados |
+
+Todas las herramientas pueden instalarse con [asdf](https://asdf-vm.com/). Las versiones
+exactas están fijadas en el archivo `.tool-versions` de la raíz del repositorio:
+
+```bash
+asdf install
+```
 
 > **KUBECONFIG**: El script guarda la configuración del cluster en `.kube/config` dentro
 > de esta carpeta. Si usás [direnv](https://direnv.net/), el `.envrc` incluido configura
@@ -36,19 +50,22 @@ Helm chart genérico ubicado en [`../helm/`](../helm/).
 
 ## Crear el ambiente
 
+El script `cluster-setup` está en `bin/` y se agrega al `PATH` mediante el `.envrc` raíz.
+
 ```bash
-cd kubernetes/
-./cluster-setup up
+cluster-setup up
 ```
 
 El script realiza los siguientes pasos:
 
 1. Verifica que `kind`, `kubectl`, `helm` y `helmfile` estén instalados.
 2. Crea el cluster Kind `demo-apps` con la configuración de `config.yaml`
-   (Kubernetes v1.34, hostPort 80/443, label `ingress-ready` en el nodo).
-3. Instala ingress-nginx y espera a que esté listo.
+   (Kubernetes v1.34, hostPorts 80/443, label `ingress-ready` en el nodo).
+3. Instala Gateway API CRDs y nginx-gateway-fabric, y espera a que el Gateway esté listo.
 4. Instala KEDA.
-5. Instala el stack LGTM distribuido y espera a que Grafana esté disponible.
+5. Instala los operadores de base de datos (mysql-operator y cloudnative-pg).
+6. Instala el stack de observabilidad y espera a que Grafana esté disponible.
+7. Instala Ganesha NFS y espera a que el provisioner esté listo.
 
 Una vez finalizado, Grafana es accesible en **http://grafana.localhost** (acceso
 anónimo con rol de administrador, sin login).
@@ -68,46 +85,30 @@ ghcr.io/<usuario>/<repo>/wagtail/app:<versión>
 ghcr.io/<usuario>/<repo>/wagtail/nginx:<versión>
 ```
 
-Para desplegar una app, usá el chart en `../helm/` pasando los valores específicos:
+Las credenciales del registry se manejan como secrets cifrados con SOPS. Para desplegar
+las apps usá el helmfile de aplicaciones desde el directorio `kubernetes/`:
 
 ```bash
-# Ejemplo: desplegar Wagtail
-helm upgrade --install wagtail ../helm/ \
-  --namespace demo-apps --create-namespace \
-  --set app.image.repository=ghcr.io/<usuario>/<repo>/wagtail/app \
-  --set app.image.tag=<versión> \
-  --set nginx.image.repository=ghcr.io/<usuario>/<repo>/wagtail/nginx \
-  --set nginx.image.tag=<versión> \
-  --set app.port=8000 \
-  --set app.staticDir=/app/bakerydemo/static \
-  --set app.fileDir=/app/bakerydemo/media \
-  --set ingress.enabled=true \
-  --set ingress.className=nginx \
-  --set "ingress.hosts[0].host=wagtail.localhost" \
-  --set "ingress.hosts[0].paths[0].path=/" \
-  --set "ingress.hosts[0].paths[0].pathType=Prefix"
+cd kubernetes/
+helmfile --file helmfile.d/06-applications.yaml apply
 ```
-
-> Las variables de entorno específicas de cada app (credenciales de base de datos,
-> endpoints de OTel, etc.) se pasan vía `--set app.env.<VAR>=<valor>` o mediante
-> un archivo de valores `-f values-wagtail.yaml`.
 
 ## Verificar el estado
 
 ```bash
-./cluster-setup status
+cluster-setup status
 ```
 
 Muestra los nodos, pods de todos los namespaces y los ingresses activos.
 
 ## URLs de acceso
 
-| Servicio | URL |
-|----------|-----|
-| Grafana | http://grafana.localhost |
-| WordPress | http://wordpress.localhost *(si se desplegó)* |
-| Redmine | http://redmine.localhost *(si se desplegó)* |
-| Wagtail | http://wagtail.localhost *(si se desplegó)* |
+| Servicio | URL | Credenciales |
+|----------|-----|--------------|
+| Grafana | http://grafana.localhost | N/A (acceso anónimo) |
+| WordPress | http://wordpress.localhost *(si se desplegó)* | admin / admin |
+| Redmine | http://redmine.localhost *(si se desplegó)* | admin / admin |
+| Wagtail | http://wagtail.localhost *(si se desplegó)* | admin / changeme |
 
 > Los dominios `*.localhost` se resuelven localmente sin necesidad de modificar
 > `/etc/hosts` en Linux. En macOS puede ser necesario agregar las entradas manualmente.
@@ -115,7 +116,7 @@ Muestra los nodos, pods de todos los namespaces y los ingresses activos.
 ## Destruir el ambiente
 
 ```bash
-./cluster-setup down
+cluster-setup down
 ```
 
 Elimina el cluster Kind `demo-apps` y todos sus recursos. La carpeta `.kube/` con la
@@ -125,24 +126,27 @@ configuración del cluster también puede borrarse manualmente.
 
 ```
 kubernetes/
-├── cluster-setup          # Script de gestión del cluster (up / down / status)
 ├── config.yaml            # Configuración del cluster Kind (versión k8s, puertos, labels)
-├── .envrc                 # Configura KUBECONFIG para direnv
+├── .envrc                 # Configura KUBECONFIG y SOPS_AGE_RECIPIENTS para direnv
+├── charts/
+│   └── gateway-api-crd/   # Chart local con los CRDs de Gateway API (kustomize)
 └── helmfile.d/
-    ├── 01-ingress-nginx.yaml   # Helm release: ingress-nginx
-    ├── 02-keda.yaml            # Helm release: KEDA
-    ├── 03-observability.yaml   # Helm release: lgtm-distributed
-    └── values/
-        ├── ingress-nginx.yaml  # hostPort habilitado, nodeSelector ingress-ready
-        ├── keda.yaml           # (valores por defecto)
-        └── lgtm-distributed.yaml  # Grafana con ingress y acceso anónimo habilitado
+    ├── bases/
+    │   └── repositories.yaml       # Repositorios Helm compartidos entre helmfiles
+    ├── 01-gateway-api.yaml         # Helm release: Gateway API CRDs + nginx-gateway-fabric
+    ├── 02-keda.yaml                # Helm release: KEDA
+    ├── 03-database-operators.yaml  # Helm releases: mysql-operator y cloudnative-pg
+    ├── 04-observability.yaml       # Helm releases: grafana, mimir, loki, tempo, minio, otel-collector
+    ├── 05-ganesha-nfs.yaml         # Helm release: nfs-server-provisioner
+    ├── 06-applications.yaml        # Helm releases: wordpress, redmine, wagtail (+ sus BDs)
+    └── values/                     # Archivos de valores por release
 ```
 
 ## Helm chart de las apps (`../helm/`)
 
 El chart en `../helm/` es genérico: puede desplegar cualquiera de las tres apps.
 Cada release genera un Deployment con dos contenedores (app + nginx sidecar), un
-Service ClusterIP, un Ingress y opcionalmente un PVC para archivos persistentes.
+Service ClusterIP, un HTTPRoute (Gateway API) y opcionalmente un PVC para archivos persistentes.
 
 Los valores principales a configurar por app son:
 
@@ -155,5 +159,5 @@ Los valores principales a configurar por app son:
 | `app.fileDir` | Ruta de los archivos subidos (mapeada al PVC si `persistence.enabled=true`) |
 | `app.env` | Variables de entorno (configmap) |
 | `app.secretEnv` | Variables de entorno sensibles (secret) |
-| `ingress.hosts` | Hostname del ingress |
+| `ingress.hosts` | Hostname del HTTPRoute |
 | `persistence.enabled` / `persistence.size` | Habilitar PVC para archivos persistentes |

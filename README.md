@@ -27,7 +27,7 @@ sus señales de telemetría (trazas, métricas y logs) en un stack de observabil
 ### Estructura del repositorio
 
 ```
-├── bin/                    # Scripts para gestionar el ambiente (service-run, service-stop, etc.)
+├── bin/                    # Scripts para gestionar el ambiente (compose-run, compose-stop, cluster-setup, etc.)
 ├── compose_files/          # Archivos Docker Compose por servicio
 ├── container_files/        # Containerfiles multi-stage para cada aplicación
 ├── etc/                    # Configuración de servicios
@@ -43,14 +43,16 @@ sus señales de telemetría (trazas, métricas y logs) en un stack de observabil
 └── kubernetes/             # Config de cluster Kind y releases con Helmfile
 ```
 
-## Requisitos
+## Ambiente basado en docker compose
+
+### Requisitos
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
 > Los scripts en `bin/` se agregan automáticamente al `PATH` si se usa [direnv](https://direnv.net/) con el `.envrc` incluido.
 
-## Iniciar el ambiente
+### Iniciar el ambiente
 
 Los servicios se gestionan con los scripts del directorio `bin/`. El argumento puede ser
 `base`, `wordpress`, `redmine`, `wagtail` o `all` (también se aceptan las abreviaciones
@@ -59,7 +61,7 @@ Los servicios se gestionan con los scripts del directorio `bin/`. El argumento p
 **1. Iniciar la infraestructura base** (obligatorio, debe ejecutarse primero):
 
 ```bash
-./bin/service-run base
+compose-run base
 ```
 
 Esto levanta el colector de OpenTelemetry, Grafana, Mimir, Loki, Tempo y el proxy Nginx.
@@ -67,18 +69,18 @@ Esto levanta el colector de OpenTelemetry, Grafana, Mimir, Loki, Tempo y el prox
 **2. Levantar una o más aplicaciones demo:**
 
 ```bash
-./bin/service-run wordpress
-./bin/service-run redmine
-./bin/service-run wagtail
+compose-run wordpress
+compose-run redmine
+compose-run wagtail
 ```
 
 O todas a la vez:
 
 ```bash
-./bin/service-run all
+compose-run all
 ```
 
-## URLs de acceso
+### URLs de acceso
 
 Una vez levantado el ambiente:
 
@@ -91,10 +93,10 @@ Una vez levantado el ambiente:
 
 > Grafana está configurado con acceso anónimo en rol de administrador. No requiere login.
 
-## Destruir el ambiente
+### Destruir el ambiente
 
 ```bash
-./bin/service-stop all
+compose-stop all
 ```
 
 > **Atención**: este comando ejecuta `docker compose down -v`, por lo que elimina los contenedores
@@ -104,29 +106,33 @@ Una vez levantado el ambiente:
 Para detener únicamente una aplicación específica sin afectar el resto:
 
 ```bash
-./bin/service-stop wordpress
+compose-stop wordpress
 ```
 
-## Otros comandos
+### Otros comandos
 
 ```bash
 # Reconstruir las imágenes de contenedor
-./bin/service-build <DEMO>
+compose-build <DEMO>
 
 # Ver logs en tiempo real
-./bin/service-logs <DEMO>
+compose-logs <DEMO>
 ```
+
+## Ambiente basado en k8s
+
+La documentación del ambiente basado en k8s se puede encontrar en el [siguiente archivo](./kubernetes/README.md)
 
 ## Estresar las aplicaciones con Locust
 
 El directorio `locust/` contiene archivos de prueba de carga para cada aplicación:
 
-| Archivo             | Aplicación                              |
-|---------------------|-----------------------------------------|
-| `locust/wordpress.py` | WordPress                             |
-| `locust/redmine.py`   | Redmine                               |
-| `locust/wagtail.py`   | Wagtail                               |
-| `locust/all.py`       | Las tres aplicaciones simultáneamente |
+| Archivo               | Aplicación                              |
+|-----------------------|-----------------------------------------|
+| `locust/wordpress.py` | WordPress                               |
+| `locust/redmine.py`   | Redmine                                 |
+| `locust/wagtail.py`   | Wagtail                                 |
+| `locust/all.py`       | Las tres aplicaciones simultáneamente   |
 
 No hace falta instalar Locust: se puede correr directamente con Docker.
 
