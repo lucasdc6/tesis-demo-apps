@@ -5,6 +5,6 @@ releases:
   - name: ganesha-nfs
     chart: ganesha-nfs/nfs-server-provisioner
     namespace: ganesha-nfs
-    version: 1.8.0
+    version: 1.8.*
     values:
       - values/ganesha.yaml

@@ -5,21 +5,25 @@ releases:
   - name: grafana
     namespace: grafana
     chart: grafana-community/grafana
+    version: 11.3.*
     values:
       - values/grafana.yaml
   - name: minio
     namespace: minio
     chart: minio/minio
+    version: 5.4.*
     values:
       - values/minio.yaml
   - name: minio-route
     namespace: minio
     chart: bedag/raw
+    version: 2.0.*
     values:
       - values/minio-route.yaml
   - name: mimir
     namespace: mimir
     chart: grafana/mimir-distributed
+    version: 6.0.*
     values:
       - values/mimir.yaml
     needs:
@@ -27,6 +31,7 @@ releases:
   - name: loki
     namespace: loki
     chart: grafana/loki
+    version: 6.55.*
     values:
       - values/loki.yaml
     needs:
@@ -34,6 +39,7 @@ releases:
   - name: tempo
     namespace: tempo
     chart: grafana-community/tempo-distributed
+    version: 2.6.*
     values:
       - values/tempo.yaml
   - name: kube-state-metrics
@@ -45,6 +51,6 @@ releases:
   - name: opentelemetry-collector
     namespace: opentelemetry
     chart: open-telemetry/opentelemetry-collector
-    version: 0.146.1
+    version: 0.147.*
     values:
       - values/opentelemetry.yaml

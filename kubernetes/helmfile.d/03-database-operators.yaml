@@ -6,6 +6,8 @@ releases:
     namespace: mysql-operator
     chart: bitpoke/mysql-operator
     version: 0.6.*
+    values:
+      - ./values/mysql-operator.yaml
   - name: cnpg
     namespace: cnpg
     chart: cnpg/cloudnative-pg

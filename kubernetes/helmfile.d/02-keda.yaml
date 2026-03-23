@@ -5,6 +5,6 @@ releases:
   - name: keda
     namespace: keda
     chart: kedacore/keda
-    version: 2.18.*
+    version: 2.19.*
     values:
       - values/keda.yaml
