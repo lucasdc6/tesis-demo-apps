@@ -1,0 +1,34 @@
+extraObjects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: locust-scripts
+    data:
+      all.py: |
+        {{ readFile "../../../locust/all.py" | nindent 8 }}
+      wordpress.py: |
+        {{ readFile "../../../locust/wordpress.py" | nindent 8 }}
+      redmine.py: |
+        {{ readFile "../../../locust/redmine.py" | nindent 8 }}
+      wagtail.py: |
+        {{ readFile "../../../locust/wagtail.py" | nindent 8 }}
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: locust
+      namespace: locust
+    spec:
+      parentRefs:
+        - name: nginx
+          namespace: nginx-gateway
+          sectionName: http
+      hostnames:
+        - locust.localhost
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          backendRefs:
+            - name: locust
+              port: 8089

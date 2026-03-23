@@ -26,3 +26,6 @@ repositories:
     url: https://jitterbit.github.io/charts
   - name: valkey
     url: https://valkey.io/valkey-helm
+  - name: locust
+    url: ghcr.io/deliveryhero/helm-charts
+    oci: true

@@ -1,0 +1,34 @@
+loadtest:
+  name: demo
+  locust_locustfile: all.py
+  locust_locustfile_configmap: locust-scripts
+  locust_host: ""
+
+master:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+worker:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+service:
+  type: ClusterIP
+
+hostAliases:
+  - ip: "10.96.12.80"
+    hostnames:
+      - redmine.localhost
+      - wordpress.localhost
+      - wagtail.localhost

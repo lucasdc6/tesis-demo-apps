@@ -1,0 +1,11 @@
+bases:
+  - ./bases/repositories.yaml
+---
+releases:
+  - name: locust
+    namespace: locust
+    chart: locust/locust
+    version: 0.34.*
+    values:
+      - values/locust.yaml
+      - values/locust-scripts.yaml.gotmpl
