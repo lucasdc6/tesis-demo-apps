@@ -1,0 +1,9 @@
+[project]
+name = "slides"
+version = "0.1.0"
+description = "Diapositivas usadas para la exposición de la tesis 'Observabilidad, una base para aplicaciones resilientes'"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mkslides>=2.0.0",
+]

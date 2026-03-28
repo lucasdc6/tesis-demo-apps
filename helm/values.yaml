@@ -222,13 +222,17 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 10
   cooldownPeriod: 60
+  threshold: 10
   prometheusServerAddr: ""
-  query: >
-    sum(
-      rate(
-        traces_spanmetrics_calls{service_name="{{ include "application.fullname" . }}"}[2m]
-      )
-    )
+  triggers: []
+  # - metricName: request-rate
+  #   threshold: 10
+  #   query: >
+  #     sum(
+  #       rate(
+  #         traces_spanmetrics_calls{service_name="{{ include "application.fullname" . }}"}[2m]
+  #       )
+  #     )
 
 # Additional volumes on the output Deployment definition.
 volumes: []

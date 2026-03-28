@@ -1,0 +1,20 @@
+index:
+  title: Observabilidad, una base para aplicaciones resilientes
+
+slides:
+  title: Frontmatter title.
+  theme: solarized
+  separator: <!--s-->
+  separator_vertical: <!--v-->
+  preprocess_script: scripts/build.py
+  highlight_theme: vs
+
+revealjs:
+  height: 1080
+  width: 1920
+  transition: zoom
+
+plugins:
+  - name: RevealMermaid
+    extra_javascript:
+      - https://cdn.jsdelivr.net/npm/reveal.js-mermaid-plugin/plugin/mermaid/mermaid.min.js

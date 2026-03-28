@@ -90,9 +90,22 @@ route:
 autoscaling:
   enabled: true
   prometheusServerAddr: http://mimir-gateway.mimir.svc/prometheus
-  query: >
-    sum(
-      rate(
-        traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
-      )
-    )
+  triggers:
+    - metricName: request-rate
+      threshold: "10"
+      query: >
+        sum(
+          rate(
+            traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
+          )
+        )
+    # - metricName: p95-latency
+    #   threshold: "2"
+    #   query: >
+    #     histogram_quantile(0.95,
+    #       sum(
+    #         rate(
+    #           traces_spanmetrics_duration_seconds_bucket{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
+    #         )
+    #       ) by (le)
+    #     )
