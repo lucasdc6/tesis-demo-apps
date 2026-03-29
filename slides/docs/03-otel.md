@@ -8,23 +8,6 @@ Proyecto de la **CNCF** (Cloud Native Computing Foundation), fusión de OpenTrac
 
 Unifica las tres señales bajo un único protocolo: **OTLP** _(OpenTelemetry Protocol)_
 
-<!--v-->
-
-### Evolución histórica
-
-<br>
-
-<div class="mermaid">
-timeline
-    2012 : Twitter ➜ Zipkin<br>─────────<br>Primer OSS de trazas
-    2015 : Uber ➜ Jaeger<br>─────────<br>Escalabilidad + UI
-    2016 : CNCF ➜ Prometheus<br>────────<br>Métricas pull, OpenMetrics
-    2019 : OpenTracing + OpenCensus ➜ OpenTelemetry
-    2023 : GrafanaLabs adopta OTLP
-</div>
-
-<br>
-
 > _Antes de OTel: un vendor diferente por cada señal, vendor lock-in en cada capa_
 
 <!--v-->

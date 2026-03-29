@@ -67,7 +67,7 @@ Almacenamiento de trazas con integración nativa en Grafana
 <div class="mermaid">
 flowchart LR
     WP["WordPress<br>PHP / OTLP HTTP :4318"]
-    RM["Redmine<br>Ruby / Fluentd :8006"]
+    RM["Redmine<br>Ruby / OTLP HTTP :4318 & Fluentd :8006"]
     WG["Wagtail<br>Python / OTLP gRPC :4317"]
     OC["OTel Collector"]
     MM[("Mimir")]

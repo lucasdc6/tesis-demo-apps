@@ -108,4 +108,4 @@ Asesor profesional: Leandro Di Tommaso
 
 _Licenciatura en Informática — UNLP, Facultad de Informática_
 
-_Marzo 2026_
+_Mayo 2026_
