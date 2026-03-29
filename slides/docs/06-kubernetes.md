@@ -3,17 +3,32 @@
 Objetivo: demostrar el **escalado automático impulsado por telemetría**
 en un entorno equivalente al productivo
 
-<br>
+<!--v-->
 
-Cluster local con **Kind** (Kubernetes in Docker)
+## Cluster local con _Kind_ (Kubernetes in Docker)
 
 Infraestructura instalada con Helmfile:
 
 | Componente | Rol |
 |---|---|
-| `ingress-nginx` | Controlador de Ingress, expone servicios en `*.localhost` |
-| `KEDA` | Operador de escalado basado en métricas externas |
-| `lgtm-distributed` | Stack de observabilidad: Loki + Grafana + Tempo + Mimir |
+| `NGINX Fabric` | Controlador de Gateway API, expone servicios en `*.localhost` |
+| `KEDA` | Operador de escalado basado en métricas externas con soporte nativo para Prometheus |
+| `Ganesha NFS` | Servidor NFS para volúmenes compartidos entre réplicas (ReadWriteMany) |
+| `mysql-operator` | Operador para gestionar instancias de MySQL como recursos de Kubernetes |
+| `CloudNativePG` | Operador para gestionar clústeres de PostgreSQL nativos en Kubernetes |
+
+<!--v-->
+
+## Cluster local con _Kind_ (Kubernetes in Docker)
+
+
+| Componente | Rol |
+|---|---|
+| `Grafana` | Visualización unificada de las tres señales de observabilidad |
+| `Mimir` | Almacenamiento de métricas compatible con la API de Prometheus |
+| `Loki` | Almacenamiento de logs indexado por etiquetas |
+| `Tempo` | Almacenamiento de trazas distribuidas multi-formato |
+| `OpenTelemetry Collector` | Recolección, procesamiento y exportación centralizada de telemetría |
 
 <!--v-->
 
@@ -27,7 +42,7 @@ Recursos generados por release:
 - **ConfigMap / Secret** — variables de entorno (credenciales, endpoints OTel)
 - **Ingress** — expone el servicio en `<app>.localhost`
 - **ScaledObject** — reglas de escalado horizontal con KEDA
-- **PersistentVolumeClaim** — almacenamiento para archivos de usuario (WordPress, Wagtail)
+- **PersistentVolumeClaim** — almacenamiento para archivos compartidos
 
 <!--v-->
 
@@ -63,7 +78,7 @@ flowchart TD
     A["Trazas de la app"] --> B["OTel Collector<br>spanmetrics connector"]
     B --> C["traces_spanmetrics_calls_total"]
     C --> D[("Mimir")]
-    D --> E["KEDA"]
+    E["KEDA"] --> D
 </div>
 
 > _La misma telemetría que se consulta en Grafana alimenta la lógica de escalado_
@@ -79,8 +94,6 @@ locust -f locust/all.py \
   --users 50 --spawn-rate 5 \
   --headless --run-time 3m
 ```
-
-Pesos: WordPress 3x · Redmine 2x · Wagtail 2x
 
 <!--v-->
 

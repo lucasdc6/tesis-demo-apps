@@ -49,18 +49,16 @@ Conjuntos de métricas estándar:
 
 <br>
 
-**Push** — el servicio envía los datos al backend
+- **Push** — el servicio envía los datos al backend
 
-- Lógica distribuida en cada agente
-- Complejidad crece con el número de servicios
-- Ejemplo: stack TICK (Telegraf · InfluxDB · Chronograf · Kapacitor)
+    - Lógica distribuida en cada agente
+    - Complejidad crece con el número de servicios
+    - Ejemplo: stack TICK (Telegraf · InfluxDB · Chronograf · Kapacitor)
 
-<br>
+- **Pull** — el backend recupera los datos de los exporters
 
-**Pull** — el backend recupera los datos de los exporters
-
-- Configuración centralizada
-- Ejemplo: Prometheus + node-exporter
+    - Configuración centralizada
+    - Ejemplo: Prometheus + node-exporter
 
 <!--v-->
 

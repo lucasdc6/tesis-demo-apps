@@ -16,10 +16,10 @@ Unifica las tres señales bajo un único protocolo: **OTLP** _(OpenTelemetry Pro
 
 <div class="mermaid">
 timeline
-    2012 : Twitter → Zipkin<br>Primer OSS de trazas
-    2015 : Uber → Jaeger<br>Escalabilidad + UI
-    2016 : CNCF → Prometheus<br>Métricas pull, OpenMetrics
-    2019 : OpenTracing + OpenCensus → OpenTelemetry
+    2012 : Twitter ➜ Zipkin<br>─────────<br>Primer OSS de trazas
+    2015 : Uber ➜ Jaeger<br>─────────<br>Escalabilidad + UI
+    2016 : CNCF ➜ Prometheus<br>────────<br>Métricas pull, OpenMetrics
+    2019 : OpenTracing + OpenCensus ➜ OpenTelemetry
     2023 : GrafanaLabs adopta OTLP
 </div>
 
@@ -61,7 +61,7 @@ flowchart LR
 Ventajas:
 - Cambiar el backend **sin tocar las aplicaciones**
 - Buffer local ante indisponibilidad de las bases de datos
-- Conector `spanmetrics`: deriva métricas RED directamente desde trazas
+- Conector `spanmetrics` ➜ deriva métricas RED directamente desde trazas
 
 <!--v-->
 

@@ -42,17 +42,17 @@ Con arquitecturas distribuidas y microservicios:
 
 <!--v-->
 
-## Problema
+## Problemas
 
-Los sistemas modernos exigen **99,9% de disponibilidad**
+- Los sistemas modernos exigen **99,9% de disponibilidad**
 
-Los servicios se degradan ante picos de demanda imprevistos
+- Los servicios se degradan ante picos de demanda imprevistos
 
-Sin visibilidad interna, diagnosticar un incidente puede llevar horas
+- Sin visibilidad interna, diagnosticar un incidente puede llevar horas
 
 <br>
 
-### ¿Cómo comprender el comportamiento de un sistema en su ambiente productivo, independientemente de la tecnología?
+#### ¿Cómo comprender el comportamiento de un sistema en su ambiente productivo, independientemente de la tecnología?
 
 <!--v-->
 

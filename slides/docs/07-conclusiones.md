@@ -8,7 +8,7 @@ Se instrumentaron tres aplicaciones en lenguajes distintos
 **sin modificar su código fuente**, centralizando la telemetría
 en un stack open-source unificado.
 
-Desplegado en dos entornos complementarios:
+Las pruebas fueron desplegadas en 2 entornos:
 
 - **Docker Compose** — desarrollo local e inspección de trazas
 - **Kubernetes (Kind)** — escalado automático impulsado por telemetría

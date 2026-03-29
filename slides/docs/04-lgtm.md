@@ -9,7 +9,7 @@ Arquitectura de observabilidad open-source propuesta por **GrafanaLabs**
 | **L**oki | Logs | Almacenamiento indexado por etiquetas |
 | **G**rafana | — | Visualización y correlación unificada |
 | **T**empo | Trazas | Almacenamiento eficiente multi-formato |
-| **M**imir | Métricas | Backend compatible con API de Prometheus |
+| **M**imir | Métricas | Almacenamiento compatible con API de Prometheus |
 
 <br>
 
@@ -27,10 +27,10 @@ Almacenamiento de métricas de **alta cardinalidad** y retención configurable
 
 <br>
 
-Usado en esta tesina como fuente de métricas para **KEDA**:
+Usado en esta tesina como fuente de métricas para el escalado horizontal:
 
 ```promql
-sum(rate(traces_spanmetrics_calls_total{service_name="wagtail"}[1m]))
+sum(rate(traces_spanmetrics_calls_total{service_name="<servicio>"}[1m]))
 ```
 
 <!--v-->
@@ -85,3 +85,5 @@ flowchart LR
 
 El conector `spanmetrics` genera métricas RED a partir de trazas,
 **sin instrumentación adicional**
+
+Alternativamente, se puede utilizar la componente `Metrics-generator` de `Tempo`

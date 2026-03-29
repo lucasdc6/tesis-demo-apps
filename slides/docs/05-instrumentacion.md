@@ -1,7 +1,6 @@
 ## 4. Instrumentación
 
-Tres aplicaciones desarrolladas en lenguajes y frameworks diferentes,
-**sin modificar su código fuente**
+Tres aplicaciones desarrolladas en lenguajes y frameworks diferentes
 
 <br>
 
@@ -23,7 +22,7 @@ Instrumentación automática sin tocar el código fuente de WordPress
 
 **Dependencias:**
 
-1. Extensión nativa PHP vía `pecl install opentelemetry protobuf`
+1. Extensiónes nativa PHP: `opentelemetry` · `protobuf`
 2. Paquetes Composer: `opentelemetry-auto-wordpress` + SDK + exporter OTLP
 
 **Activación transparente:**
@@ -111,12 +110,10 @@ flowchart TD
     CF --> NGX
 </div>
 
-Toda la configuración se inyecta por **variables de entorno** (factor 3):
+Toda la configuración se inyecta por **variables de entorno** (factor 3 de Twelve-Factor App):
 
 ```bash
 OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
 OTEL_SERVICE_NAME=wordpress
 OTEL_RESOURCE_ATTRIBUTES=deployment.environment=production
 ```
-
-Ambiente local con **Docker Compose**: infraestructura LGTM + las tres apps
