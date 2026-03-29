@@ -1,10 +1,10 @@
 index:
   title: "Observabilidad, una base para aplicaciones resilientes"
-  favicon: statics/favicon.png
+  favicon: favicon.png
 
 slides:
   title: "Observabilidad, una base para aplicaciones resilientes"
-  favicon: statics/favicon.png
+  favicon: favicon.png
   theme: solarized
   separator: <!--s-->
   separator_vertical: <!--v-->
