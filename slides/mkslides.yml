@@ -1,8 +1,10 @@
 index:
-  title: Observabilidad, una base para aplicaciones resilientes
+  title: "Observabilidad, una base para aplicaciones resilientes"
+  favicon: statics/favicon.png
 
 slides:
-  title: Frontmatter title.
+  title: "Observabilidad, una base para aplicaciones resilientes"
+  favicon: statics/favicon.png
   theme: solarized
   separator: <!--s-->
   separator_vertical: <!--v-->
@@ -12,7 +14,8 @@ slides:
 revealjs:
   height: 1080
   width: 1920
-  transition: zoom
+  transition: slide
+  progress: true
 
 plugins:
   - name: RevealMermaid
