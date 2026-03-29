@@ -1,10 +1,10 @@
 index:
   title: "Observabilidad, una base para aplicaciones resilientes"
-  favicon: favicon.png
+  favicon: https://www.info.unlp.edu.ar/wp-content/uploads/2019/12/cropped-logoblanco2-1-32x32.png
 
 slides:
   title: "Observabilidad, una base para aplicaciones resilientes"
-  favicon: favicon.png
+  favicon: https://www.info.unlp.edu.ar/wp-content/uploads/2019/12/cropped-logoblanco2-1-32x32.png
   theme: solarized
   separator: <!--s-->
   separator_vertical: <!--v-->
