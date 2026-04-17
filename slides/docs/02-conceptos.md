@@ -45,23 +45,6 @@ Conjuntos de métricas estándar:
 
 <!--v-->
 
-### Modelos de recolección
-
-<br>
-
-- **Push** — el servicio envía los datos al backend
-
-    - Lógica distribuida en cada agente
-    - Complejidad crece con el número de servicios
-    - Ejemplo: stack TICK (Telegraf · InfluxDB · Chronograf · Kapacitor)
-
-- **Pull** — el backend recupera los datos de los exporters
-
-    - Configuración centralizada
-    - Ejemplo: Prometheus + node-exporter
-
-<!--v-->
-
 ## Logs
 
 Describen **eventos discretos** que ocurren en un instante de tiempo.

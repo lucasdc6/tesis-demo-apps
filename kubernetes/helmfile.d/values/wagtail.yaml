@@ -78,9 +78,12 @@ route:
 autoscaling:
   enabled: true
   prometheusServerAddr: http://mimir-gateway.mimir.svc/prometheus
-  query: >
-    sum(
-      rate(
-        traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
-      )
-    )
+  triggers:
+    - metricName: request-rate
+      threshold: "10"
+      query: >
+        sum(
+          rate(
+            traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}"}[2m]
+          )
+        )

@@ -87,13 +87,8 @@ flowchart TD
 
 ## Prueba de carga con Locust
 
-Scripts de Locust simulan usuarios navegando las tres aplicaciones:
+Ingresar al sitio <a href="http://locust.localhost" target="_blank">Locust</a>
 
-```bash
-locust -f locust/all.py \
-  --users 50 --spawn-rate 5 \
-  --headless --run-time 3m
-```
 
 <!--v-->
 
