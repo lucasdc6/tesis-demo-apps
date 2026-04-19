@@ -8,6 +8,12 @@ nginx:
         value: kind
   service:
     type: NodePort
+    patches:
+    - type: JSONPatch
+      value:
+        - op: add
+          path: /spec/clusterIP
+          value: 10.96.12.80
     nodePorts:
     - port: 30080
       listenerPort: 80
@@ -19,6 +25,13 @@ nginx:
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         action: NoSchedule
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
 
 gateways:
   - name: nginx

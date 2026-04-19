@@ -9,11 +9,41 @@ route:
         namespace: nginx-gateway
         sectionName: http
 
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
 env:
   GF_AUTH_ANONYMOUS_ENABLED: "true"
   GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
   GF_AUTH_DISABLE_LOGIN_FORM: "true"
   GF_FEATURE_TOGGLES_ENABLE: "traceqlEditor traceQLStreaming metricsSummary"
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    kubernetes-horizontal-pod-autoscaler:
+      gnetId: 20718
+      revision: 1
+      datasource:
+        - name: DS_GRAFANACLOUD-RAGHUNATHCHARY-PROM
+          value: Mimir
 
 datasources:
   datasources.yaml:

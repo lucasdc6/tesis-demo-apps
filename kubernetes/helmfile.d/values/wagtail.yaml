@@ -37,6 +37,13 @@ app:
   secretEnv:
     DATABASE_PASSWORD: wagtail-password
     DJANGO_SECRET_KEY: changeme
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
   livenessProbe:
     tcpSocket:
       port: app
@@ -61,8 +68,13 @@ nginx:
     repository: ghcr.io/lucasdc6/tesis-demo-apps/wagtail/nginx
     tag: latest
   staticMountPath: /app/bakerydemo/static
-  livenessProbe: null
-  readinessProbe: null
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
 
 route:
   enabled: true

@@ -165,6 +165,7 @@ cmd_up() {
   echo -e "${GREEN}${BOLD}Ambiente listo.${NC}"
   echo ""
   echo -e "  ${BOLD}Grafana${NC}   →  http://grafana.localhost"
+  echo -e "  ${BOLD}Locust${NC}    →  http://locust.localhost"
   echo ""
   echo "  Para desplegar las apps demo consultá el README."
   echo "  Para ver el estado: $(basename "$0") status"

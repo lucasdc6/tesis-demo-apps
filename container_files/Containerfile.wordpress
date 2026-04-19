@@ -9,7 +9,11 @@ RUN pecl install opentelemetry protobuf redis ;\
     docker-php-ext-enable \
       opentelemetry.so \
       protobuf.so \
-      redis.so
+      redis.so && \
+    wget -O /usr/local/bin/php-fpm-healthcheck \
+        https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck && \
+        chmod +x /usr/local/bin/php-fpm-healthcheck
+
 COPY etc/php/*.php.ini $PHP_INI_DIR/conf.d/.
 COPY --from=build /app/vendor /var/www/otel
 ENV OTEL_AUTOLOAD_PATH=/var/www/otel/autoload.php \

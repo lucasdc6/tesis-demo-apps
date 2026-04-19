@@ -8,7 +8,11 @@ persistence:
 
 resources:
   requests:
+    cpu: 200m
     memory: 2Gi
+  limits:
+    cpu: 1000m
+    memory: 4Gi
 
 buckets:
   - name: mimir-chunks
