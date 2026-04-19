@@ -9,6 +9,7 @@
 set -euo pipefail
 
 CLUSTER_NAME="demo-apps"
+ENVIRONMENT="${1:-default}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../kubernetes"
 echo $SCRIPT_DIR
 KUBECONFIG_PATH="$SCRIPT_DIR/.kube/config"
@@ -108,7 +109,7 @@ install_infra() {
   cd "$SCRIPT_DIR"
 
   info "1/7 — gateway-api"
-  helmfile --file helmfile.d/01-gateway-api.yaml apply --suppress-diff
+  helmfile --file helmfile.d/01-gateway-api.yaml -e "${ENVIRONMENT}" apply --suppress-diff
 
   info "Esperando que gateway-api esté listo..."
   kubectl wait --namespace nginx-gateway \
@@ -118,15 +119,15 @@ install_infra() {
   ok "gateway-api listo"
 
   info "2/7 — KEDA"
-  helmfile --file helmfile.d/02-keda.yaml apply --suppress-diff
+  helmfile --file helmfile.d/02-keda.yaml -e "${ENVIRONMENT}" apply --suppress-diff
   ok "KEDA instalado"
 
   info "3/7 — Database operators"
-  helmfile --file helmfile.d/03-database-operators.yaml apply --suppress-diff
+  helmfile --file helmfile.d/03-database-operators.yaml -e "${ENVIRONMENT}" apply --suppress-diff
   ok "Database operators instalados"
 
   info "4/7 — Stack LGTM (Loki · Grafana · Tempo · Mimir)"
-  helmfile --file helmfile.d/04-observability.yaml apply --suppress-diff
+  helmfile --file helmfile.d/04-observability.yaml -e "${ENVIRONMENT}" apply --suppress-diff
 
   info "Esperando que Grafana esté listo (puede tardar ~2 min)..."
   kubectl wait --namespace grafana \
@@ -136,7 +137,7 @@ install_infra() {
   ok "Stack LGTM listo"
 
   info "5/7 — Ganesha NFS"
-  helmfile --file helmfile.d/05-ganesha-nfs.yaml apply --suppress-diff
+  helmfile --file helmfile.d/05-ganesha-nfs.yaml -e "${ENVIRONMENT}" apply --suppress-diff
 
   info "Esperando que Ganesha NFS esté listo (puede tardar ~2 min)..."
   kubectl wait --namespace ganesha-nfs \
@@ -146,10 +147,10 @@ install_infra() {
   ok "Ganesha NFS listo"
 
   info "6/7 — Aplicaciones (Redmine - Wordpress - Wagtail)"
-  helmfile --file helmfile.d/06-applications.yaml apply --suppress-diff
+  helmfile --file helmfile.d/06-applications.yaml -e "${ENVIRONMENT}" apply --suppress-diff
 
   info "7/7 — Locust"
-  helmfile --file helmfile.d/07-load-test.yaml apply --suppress-diff
+  helmfile --file helmfile.d/07-load-test.yaml -e "${ENVIRONMENT}" apply --suppress-diff
 }
 
 # ---------------------------------------------------------------------------
