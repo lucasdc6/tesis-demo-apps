@@ -23,7 +23,7 @@ extraObjects:
           namespace: nginx-gateway
           sectionName: http
       hostnames:
-        - locust.localhost
+        - locust.{{ .Values.domain }}
       rules:
         - matches:
             - path:

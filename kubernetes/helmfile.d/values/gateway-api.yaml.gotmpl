@@ -42,7 +42,7 @@ gateways:
         - name: http
           port: 80
           protocol: HTTP
-          hostname: "*.localhost"
+          hostname: "*.{{ .Values.domain }}"
           allowedRoutes:
             namespaces:
               from: All

@@ -1,0 +1,7 @@
+environments:
+  default:
+    values:
+      - ./environments/default.yaml
+  proxmox:
+    values:
+      - ./environments/proxmox.yaml

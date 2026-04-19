@@ -81,7 +81,7 @@ route:
   tracing:
     enabled: false
   hostnames:
-    - wagtail.localhost
+    - wagtail.{{ .Values.domain }}
   parentRefs:
     - name: nginx
       namespace: nginx-gateway

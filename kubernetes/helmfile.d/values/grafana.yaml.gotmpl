@@ -3,7 +3,7 @@ route:
   main:
     enabled: true
     hostnames:
-      - grafana.localhost
+      - grafana.{{ .Values.domain }}
     parentRefs:
       - name: nginx
         namespace: nginx-gateway

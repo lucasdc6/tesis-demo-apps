@@ -95,7 +95,7 @@ route:
   tracing:
     enabled: true
   hostnames:
-    - wordpress.localhost
+    - wordpress.{{ .Values.domain }}
   parentRefs:
     - name: nginx
       namespace: nginx-gateway

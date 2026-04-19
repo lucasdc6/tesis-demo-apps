@@ -5,7 +5,7 @@ resources:
       name: minio
     spec:
       hostnames:
-      - minio.localhost
+      - minio.{{ .Values.domain }}
       parentRefs:
       - group: gateway.networking.k8s.io
         kind: Gateway
