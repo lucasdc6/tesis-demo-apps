@@ -8,7 +8,7 @@ releases:
     chart: grafana-community/grafana
     version: 11.3.*
     values:
-      - values/grafana.yaml
+      - values/grafana.yaml.gotmpl
   - name: minio
     namespace: minio
     chart: minio/minio
@@ -20,7 +20,7 @@ releases:
     chart: bedag/raw
     version: 2.0.*
     values:
-      - values/minio-route.yaml
+      - values/minio-route.yaml.gotmpl
   - name: mimir
     namespace: mimir
     chart: grafana/mimir-distributed

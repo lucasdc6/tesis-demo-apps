@@ -22,7 +22,7 @@ releases:
     namespace: redmine
     chart: ../../helm
     values:
-      - values/redmine.yaml
+      - values/redmine.yaml.gotmpl
     needs:
       - redmine/redmine-regcred
       - redmine/redmine-db
@@ -45,7 +45,7 @@ releases:
     namespace: wordpress
     chart: ../../helm
     values:
-      - values/wordpress.yaml
+      - values/wordpress.yaml.gotmpl
     needs:
       - wordpress/wordpress-regcred
       - wordpress/wordpress-db
@@ -71,7 +71,7 @@ releases:
     namespace: wagtail
     chart: ../../helm
     values:
-      - values/wagtail.yaml
+      - values/wagtail.yaml.gotmpl
     needs:
       - wagtail/wagtail-regcred
       - wagtail/wagtail-db
