@@ -9,7 +9,7 @@
 set -euo pipefail
 
 CLUSTER_NAME="demo-apps"
-ENVIRONMENT="${1:-default}"
+ENVIRONMENT="${ENVIRONMENT:-default}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../kubernetes"
 echo $SCRIPT_DIR
 KUBECONFIG_PATH="$SCRIPT_DIR/.kube/config"
