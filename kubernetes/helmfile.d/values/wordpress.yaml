@@ -31,7 +31,6 @@ app:
       define('WP_DEBUG_DISPLAY', false);
     WORDPRESS_TITLE: "Wordpress Demo"
     WORDPRESS_ADMIN_USER: admin
-    WORDPRESS_URL: http://wordpress.localhost
     # OTel auto instrumentation config
     # https://opentelemetry.io/docs/instrumentation/php/automatic/#installation
     OTEL_PHP_AUTOLOAD_ENABLED: "true"

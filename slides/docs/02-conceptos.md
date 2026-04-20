@@ -1,13 +1,7 @@
 ## 1. Conceptos básicos
 
-> _"Propiedad que le permite a las personas y máquinas observar, entender
-> y actuar en respuesta al estado interno de un sistema"_
-
-Los sistemas exponen su estado a través de **señales**, clasificadas en tres pilares:
-
-- **Métricas** — valores numéricos agregables a lo largo del tiempo
-- **Logs** — eventos discretos con contexto textual
-- **Trazas** — flujo de un requerimiento a través de múltiples servicios
+> _"Capacidad de determinar el estado interno de un sistema a partir de sus
+> salidas externas en un tiempo finito" ── Rudolf Emil Kálmán_
 
 <!--v-->
 
@@ -18,7 +12,7 @@ Los sistemas exponen su estado a través de **señales**, clasificadas en tres p
 | Pilar | Volumen | Característica |
 |---|---|---|
 | Métricas | Menor | Agrupables, ideales para alertas y escalado |
-| Logs | Mayor | Eventos no distribuidos, detalle de operaciones |
+| Logs | Mayor | Eventos discretos en un instante de tiempo, detalle de operaciones |
 | Trazas | Mayor | Eventos distribuidos, visibilidad end-to-end |
 
 <br>
@@ -73,8 +67,8 @@ gantt
     axisFormat %Lms
     section GET /api/posts [52ms]
     GET /api/posts        :0, 52
-    wpdb.query SELECT     :5, 14
-    wpdb.query SELECT     :16, 17
+    wpdb.query SELECT     :5, 15
+    wpdb.query SELECT     :15, 20
     wpdb.connect          :20, 29
 </div>
 

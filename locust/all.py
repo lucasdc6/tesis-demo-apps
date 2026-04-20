@@ -25,9 +25,12 @@ def _(parser):
     )
 
 class WordPressUser(HttpUser):
-    host = "http://wordpress.localhost"
     weight = 3
     wait_time = between(1, 3)
+
+    def context(self):
+        self.host = self.environment.parsed_options.wordpress_url
+        print(f"Configured host to {self.host}")
 
     @task(4)
     def homepage(self):
@@ -51,9 +54,12 @@ class WordPressUser(HttpUser):
 
 
 class RedmineUser(HttpUser):
-    host = "http://redmine.localhost"
     weight = 2
     wait_time = between(1, 4)
+
+    def context(self):
+        self.host = self.environment.parsed_options.redmine_url
+        print(f"Configured host to {self.host}")
 
     @task(3)
     def homepage(self):
@@ -73,9 +79,12 @@ class RedmineUser(HttpUser):
 
 
 class WagtailUser(HttpUser):
-    host = "http://wagtail.localhost"
     weight = 2
     wait_time = between(1, 3)
+
+    def context(self):
+        self.host = self.environment.parsed_options.wagtail_url
+        print(f"Configured host to {self.host}")
 
     @task(4)
     def homepage(self):

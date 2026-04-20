@@ -82,15 +82,32 @@ Action Pack, Net::HTTP y Redis mediante **monkey-patching**.
 
 El SDK de Ruby **no soportaba exportar logs vía OTLP** al momento de implementar.
 
-Solución: Fluentd como puente entre Rails y el OTel Collector.
-
 El formatter incluye `trace_id` y `span_id` en cada línea de log:
 
 ```ruby
-if ENV['OTEL_EXPORTER_OTLP_ENDPOINT'].present?
-  map[:span_id]  = OpenTelemetry::Trace.current_span.context.hex_span_id
-  map[:trace_id] = OpenTelemetry::Trace.current_span.context.hex_trace_id
+if ENV['FLUENTD_URL']
+  uri = URI.parse ENV['FLUENTD_URL']
+  config.logger = Fluent::Logger::LevelFluentLogger.new(nil,
+                                                        host: uri.host,
+                                                        port: uri.port,
+                                                        use_nonblock: true,
+                                                        wait_writeable: false
+                                                      )
+  config.logger.formatter = proc do |severity, datetime, progname, message|
+    map = { level: severity }
+    map[:message]   = message if message
+    map[:progname]  = progname if progname
+    map[:service]   = uri.path[1..-1] if uri.path[1..-1]
+    if ENV['OTEL_EXPORTER_OTLP_ENDPOINT'].present?
+      map[:span_id]   = OpenTelemetry::Trace.current_span.context.hex_span_id
+      map[:trace_id]  = OpenTelemetry::Trace.current_span.context.hex_trace_id
+    end
+    map
+  end
+  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  config.logger.extend(ActiveSupport::Logger.broadcast(stdout_logger))
 end
+
 ```
 
 Esto preserva la **correlación entre logs y trazas** en Grafana.

@@ -34,9 +34,10 @@ Desacopla la generación de telemetría del almacenamiento:
 flowchart LR
     A[Aplicaciones] -->|OTLP| R[Receiver]
     R --> P[Processor<br>batch · atributos · filtros]
-    P --> E1[(Mimir<br>métricas)]
-    P --> E2[(Loki<br>logs)]
-    P --> E3[(Tempo<br>trazas)]
+    P --> E[Exporter]
+    E --> E1[(Mimir<br>métricas)]
+    E --> E2[(Loki<br>logs)]
+    E --> E3[(Tempo<br>trazas)]
 </div>
 
 <br>
