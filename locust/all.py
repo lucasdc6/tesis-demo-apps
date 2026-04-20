@@ -1,5 +1,28 @@
-from locust import HttpUser, task, between
+from locust import HttpUser, task, between, events
 
+@events.init_command_line_parser.add_listener
+def _(parser):
+    parser.add_argument(
+        "--wordpress-url", 
+        type=str, 
+        env_var="WORDPRESS_URL", 
+        default="http://wordpress.localhost", 
+        help="Wordpress url"
+    )
+    parser.add_argument(
+        "--redmine-url", 
+        type=str, 
+        env_var="REDMINE_URL", 
+        default="http://redmine.localhost", 
+        help="Redmine url"
+    )
+    parser.add_argument(
+        "--wagtail-url", 
+        type=str, 
+        env_var="WAGTAIL_URL", 
+        default="http://wagtail.localhost", 
+        help="Wagtail url"
+    )
 
 class WordPressUser(HttpUser):
     host = "http://wordpress.localhost"
