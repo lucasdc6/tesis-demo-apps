@@ -8,5 +8,5 @@ releases:
     chart: locust/locust
     version: 0.34.*
     values:
-      - values/locust.yaml
-      - values/locust-extra-objects.yaml.gotmpl
+      - values/locust/values.yaml
+      - values/locust/extra-objects.yaml.gotmpl

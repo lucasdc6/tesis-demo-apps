@@ -1,0 +1,10 @@
+rootPassword: redmine-root-password
+appDatabase: redmine
+appUser: redmine
+appPassword: redmine-password
+volumeSpec:
+  persistentVolumeClaim:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 5Gi

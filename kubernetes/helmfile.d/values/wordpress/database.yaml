@@ -1,0 +1,10 @@
+rootPassword: wordpress-root-password
+appDatabase: wordpress
+appUser: wordpress
+appPassword: wordpress-password
+volumeSpec:
+  persistentVolumeClaim:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 5Gi

@@ -1,14 +1,4 @@
 ---
-route:
-  main:
-    enabled: true
-    hostnames:
-      - grafana.{{ .Values.domain }}
-    parentRefs:
-      - name: nginx
-        namespace: nginx-gateway
-        sectionName: http
-
 resources:
   requests:
     cpu: 100m

@@ -1,0 +1,34 @@
+nginx:
+  config:
+    telemetry:
+      exporter:
+        endpoint: opentelemetry-collector.opentelemetry:4317
+      spanAttributes:
+      - key: cluster
+        value: kind
+  service:
+    type: NodePort
+    patches:
+    - type: JSONPatch
+      value:
+        - op: add
+          path: /spec/clusterIP
+          value: 10.96.12.80
+    nodePorts:
+    - port: 30080
+      listenerPort: 80
+    - port: 30443
+      listenerPort: 443
+  pod:
+    nodeSelector:
+      ingress-ready: "true"
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        action: NoSchedule
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi

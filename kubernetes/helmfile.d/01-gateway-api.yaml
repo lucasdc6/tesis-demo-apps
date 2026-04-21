@@ -15,6 +15,7 @@ releases:
     disableValidationOnInstall: true
     chart: nginx/nginx-gateway-fabric
     values:
-      - values/gateway-api.yaml.gotmpl
+      - values/gateway-api/values.yaml
+      - values/gateway-api/values.yaml.gotmpl
     needs:
       - kube-system/gateway-api-crds

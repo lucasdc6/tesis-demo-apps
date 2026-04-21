@@ -1,0 +1,16 @@
+---
+route:
+  main:
+    enabled: true
+    hostnames:
+      - grafana.{{ .Values.domain }}
+    parentRefs:
+      - name: nginx
+        namespace: nginx-gateway
+        sectionName: http
+
+dashboards:
+  default:
+    applications:
+      json: |
+        {{ readFile "dashboards/applications.json" | nindent 8 }}

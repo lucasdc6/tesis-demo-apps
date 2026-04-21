@@ -8,4 +8,4 @@ releases:
     chart: kedacore/keda
     version: 2.19.*
     values:
-      - values/keda.yaml
+      - values/keda/values.yaml

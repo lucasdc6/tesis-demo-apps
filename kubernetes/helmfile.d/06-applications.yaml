@@ -11,19 +11,19 @@ releases:
     chart: jitterbit/dockerconfigjson
     version: 1.0.*
     secrets:
-      - values/github-registry.yaml
+      - values/credentials/github-registry.yaml
   - name: redmine-db
     namespace: redmine
     chart: bitpoke/mysql-cluster
     version: 0.6.*
     values:
-      - values/redmine-db.yaml
+      - values/redmine/database.yaml
   - name: redmine
     namespace: redmine
     chart: ../../helm
     values:
-      - values/redmine.yaml
-      - values/redmine.yaml.gotmpl
+      - values/redmine/values.yaml
+      - values/redmine/values.yaml.gotmpl
     needs:
       - redmine/redmine-regcred
       - redmine/redmine-db
@@ -35,19 +35,19 @@ releases:
     chart: jitterbit/dockerconfigjson
     version: 1.0.*
     secrets:
-      - values/github-registry.yaml
+      - values/credentials/github-registry.yaml
   - name: wordpress-db
     namespace: wordpress
     chart: bitpoke/mysql-cluster
     version: 0.6.*
     values:
-      - values/wordpress-db.yaml
+      - values/wordpress/database.yaml
   - name: wordpress
     namespace: wordpress
     chart: ../../helm
     values:
-      - values/wordpress.yaml
-      - values/wordpress.yaml.gotmpl
+      - values/wordpress/values.yaml
+      - values/wordpress/values.yaml.gotmpl
     needs:
       - wordpress/wordpress-regcred
       - wordpress/wordpress-db
@@ -59,12 +59,12 @@ releases:
     chart: jitterbit/dockerconfigjson
     version: 1.0.*
     secrets:
-      - values/github-registry.yaml
+      - values/credentials/github-registry.yaml
   - name: wagtail-db
     namespace: wagtail
     chart: bedag/raw
     values:
-      - values/wagtail-db.yaml
+      - values/wagtail/database.yaml
   - name: wagtail-redis
     namespace: wagtail
     chart: valkey/valkey
@@ -73,8 +73,8 @@ releases:
     namespace: wagtail
     chart: ../../helm
     values:
-      - values/wagtail.yaml
-      - values/wagtail.yaml.gotmpl
+      - values/wagtail/values.yaml
+      - values/wagtail/values.yaml.gotmpl
     needs:
       - wagtail/wagtail-regcred
       - wagtail/wagtail-db

@@ -5,13 +5,7 @@ extraObjects:
       name: locust-scripts
     data:
       all.py: |
-        {{ readFile "../../../locust/all.py" | nindent 8 }}
-      wordpress.py: |
-        {{ readFile "../../../locust/wordpress.py" | nindent 8 }}
-      redmine.py: |
-        {{ readFile "../../../locust/redmine.py" | nindent 8 }}
-      wagtail.py: |
-        {{ readFile "../../../locust/wagtail.py" | nindent 8 }}
+        {{ readFile "../../../../locust/all.py" | nindent 8 }}
   - apiVersion: gateway.networking.k8s.io/v1
     kind: HTTPRoute
     metadata:

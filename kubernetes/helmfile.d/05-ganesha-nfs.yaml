@@ -8,4 +8,4 @@ releases:
     namespace: ganesha-nfs
     version: 1.8.*
     values:
-      - values/ganesha.yaml
+      - values/ganesha/values.yaml
