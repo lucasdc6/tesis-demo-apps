@@ -1,4 +1,6 @@
-FILES: docs/01-intro.md
+FILES: docs/00-intro.md
+
+FILES: docs/01-contexto.md
 
 FILES: docs/02-conceptos.md
 

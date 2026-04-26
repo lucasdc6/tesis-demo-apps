@@ -1,4 +1,4 @@
-## 5. Despliegue en Kubernetes
+## 6. Despliegue en Kubernetes
 
 Objetivo: demostrar el **escalado automático impulsado por telemetría**
 en un entorno equivalente al productivo

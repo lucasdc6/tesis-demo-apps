@@ -1,15 +1,20 @@
-## 1. Conceptos básicos
+## 2. Conceptos básicos
 
 > _"Capacidad de determinar el estado interno de un sistema a partir de sus
 > salidas externas en un tiempo finito" ── Rudolf Emil Kálmán_
 
+Notes:
+- Proveniente de la teoría del control
+- Propio de la ingeniería y matemática aplicada
+- Relacionado con sistemas dinámicos
+
 <!--v-->
 
-### Los tres pilares
+### Las tres señales
 
 <br>
 
-| Pilar | Volumen | Característica |
+| Señal | Volumen | Característica |
 |---|---|---|
 | Métricas | Menor | Agrupables, ideales para alertas y escalado |
 | Logs | Mayor | Eventos discretos en un instante de tiempo, detalle de operaciones |

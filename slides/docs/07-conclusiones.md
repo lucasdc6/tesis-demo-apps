@@ -1,4 +1,4 @@
-## 6. Conclusiones
+## 7. Conclusiones
 
 <!--v-->
 
@@ -15,7 +15,7 @@ Las pruebas fueron desplegadas en 2 entornos:
 
 <!--v-->
 
-## Sobre los pilares de la observabilidad
+## Sobre las señales de la observabilidad
 
 Las tres señales son **complementarias**, no redundantes:
 

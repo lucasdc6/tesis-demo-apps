@@ -1,4 +1,4 @@
-## 3. Stack LGTM
+## 4. Stack LGTM
 
 Arquitectura de observabilidad open-source propuesta por **GrafanaLabs**
 

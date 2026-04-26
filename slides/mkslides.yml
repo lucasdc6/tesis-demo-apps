@@ -10,6 +10,7 @@ slides:
   separator_vertical: <!--v-->
   preprocess_script: scripts/build.py
   highlight_theme: vs
+  separator_notes: "^Notes?:"
 
 revealjs:
   height: 1080

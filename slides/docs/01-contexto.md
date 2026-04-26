@@ -1,24 +1,4 @@
-# Observabilidad
-
-## una base para aplicaciones resilientes
-
-<br>
-
-**Lucas Di Cunzolo**
-
-Director: Miguel Angel Luengo · Codirector: Christian Adrian Rodriguez
-
-Asesor profesional: Leandro Di Tommaso
-
-<br>
-
-_Licenciatura en Informática — UNLP, Facultad de Informática_
-
-_Abril 2026_
-
-<!--s-->
-
-## Contexto
+## 1. Contexto
 
 El desarrollo de aplicaciones web ha experimentado cambios disruptivos en los últimos años:
 
@@ -27,6 +7,10 @@ El desarrollo de aplicaciones web ha experimentado cambios disruptivos en los ú
 - La infraestructura evolucionó hacia modelos **cloud-native** y contenedores
 - Surgieron varios productos (_vendors_) que ofrecían visibilidad usando diversos tipos de datos
 - Kubernetes estandarizó la gestión de infraestructuras complejas
+
+Notes:
+- 2001: Manifiesto por el Desarrollo Ágil de Software
+- 2009: DevOps
 
 <!--v-->
 
@@ -59,6 +43,10 @@ timeline
     2022 : Grafana ➜ Mimir
     2023 : Grafana adopta OTLP
 </div>
+
+Notes:
+- CNCF fundadores: Google, CoreOS, Red Hat, Twitter, Huawei, Intel, Cisco, IBM, Docker, VMware
+- En marzo salió el primer RC de OpenMetrics 2.0
 
 <!--v-->
 
@@ -123,14 +111,3 @@ Estrategias estudiadas:
 <br>
 
 > _Esta tesina se enfoca en la **adaptabilidad de servicio** como estrategia de resiliencia._
-
-<!--v-->
-
-## Estructura de la presentación
-
-1. **Conceptos básicos** — métricas, logs y trazas
-2. **OpenTelemetry** — el estándar unificador
-3. **Stack LGTM** — Loki, Grafana, Tempo, Mimir
-4. **Instrumentación** — WordPress, Redmine y Wagtail
-5. **Despliegue en Kubernetes** — Helm, KEDA y escalado automático
-6. **Conclusiones**

@@ -1,4 +1,4 @@
-## 2. OpenTelemetry
+## 3. OpenTelemetry
 
 **El estándar unificador de telemetría en entornos cloud-native**
 

@@ -93,7 +93,7 @@ config:
       logs:
         receivers: [otlp, fluentforward]
         processors: [memory_limiter, transform/fluent_logs, batch]
-        exporters: [otlphttp, debug/logs]
+        exporters: [otlphttp]
       traces:
         receivers: [otlp]
         processors: [memory_limiter, batch, filter/spans]
