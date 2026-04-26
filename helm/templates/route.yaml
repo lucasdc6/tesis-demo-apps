@@ -62,5 +62,8 @@ spec:
   tracing:
     strategy: ratio
     context: propagate
+    spanAttributes:
+      - key: upstream-service
+        value: {{ include "application.fullname" . }}
 {{- end }}
 {{- end }}
