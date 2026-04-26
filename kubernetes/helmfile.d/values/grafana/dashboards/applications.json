@@ -114,7 +114,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.4.2",
+      "pluginVersion": "12.4.1",
       "targets": [
         {
           "datasource": {
@@ -213,7 +213,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.4.2",
+      "pluginVersion": "12.4.1",
       "targets": [
         {
           "datasource": {
@@ -221,9 +221,9 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", http_status_code=~\"[45]..\"}[2m]))",
+          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", http_status_code=~\"[45]..\"}[2m])) by(http_status_code)",
           "instant": false,
-          "legendFormat": "Errors",
+          "legendFormat": "{{http_status_code}}",
           "range": true,
           "refId": "A"
         }
@@ -316,7 +316,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.4.2",
+      "pluginVersion": "12.4.1",
       "targets": [
         {
           "editorMode": "code",
@@ -391,7 +391,7 @@
         "unwrappedColumns": false,
         "wrapLogMessage": false
       },
-      "pluginVersion": "12.4.2",
+      "pluginVersion": "12.4.1",
       "targets": [
         {
           "datasource": {
@@ -531,7 +531,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "regex": ".*-demo",
+        "regex": "",
         "regexApplyTo": "value",
         "type": "query"
       }
@@ -545,6 +545,6 @@
   "timezone": "browser",
   "title": "Application",
   "uid": "glknq9",
-  "version": 6,
+  "version": 1,
   "weekStart": ""
 }
