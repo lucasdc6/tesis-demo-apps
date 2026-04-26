@@ -21,8 +21,8 @@ services:
       REDMINE_DB_USERNAME: redmine
       REDMINE_DB_PASSWORD: redmine-password
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
-      OTEL_SERVICE_NAME: redmine-demo
-      FLUENTD_URL: http://otel-collector:8006/redmine-demo
+      OTEL_SERVICE_NAME: redmine
+      FLUENTD_URL: http://otel-collector:8006/redmine
     volumes:
       - redmine_data:/usr/src/redmine/files
       - redmine_public:/usr/src/redmine/public

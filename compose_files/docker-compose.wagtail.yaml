@@ -21,7 +21,7 @@ services:
       DATABASE_URL: postgres://wagtail:wagtail-password@pg-db/wagtail
       REDIS_URL: redis://redis
       DJANGO_SETTINGS_MODULE: bakerydemo.settings.custom
-      OTEL_SERVICE_NAME: wagtail-demo
+      OTEL_SERVICE_NAME: wagtail
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_PYTHON_LOG_CORRELATION: true
       OTEL_PYTHON_LOG_FORMAT: "%(msg)s [span_id=%(span_id)s]"

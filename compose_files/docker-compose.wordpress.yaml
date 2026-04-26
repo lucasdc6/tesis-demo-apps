@@ -27,7 +27,7 @@ services:
       # OTel auto instrumentation config
       # https://opentelemetry.io/docs/instrumentation/php/automatic/#installation
       OTEL_PHP_AUTOLOAD_ENABLED: true
-      OTEL_SERVICE_NAME: wordpress-demo
+      OTEL_SERVICE_NAME: wordpress
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: otlp

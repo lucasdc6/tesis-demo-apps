@@ -24,7 +24,7 @@ app:
   env:
     REDIS_URL: redis://wagtail-redis-valkey/0
     DJANGO_SETTINGS_MODULE: bakerydemo.settings.custom
-    OTEL_SERVICE_NAME: wagtail-demo
+    OTEL_SERVICE_NAME: wagtail
     OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
     OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
     OTEL_PROPAGATORS: tracecontext,baggage

@@ -19,9 +19,9 @@ app:
     REDMINE_DB_DATABASE: redmine
     REDMINE_DB_USERNAME: redmine
     OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector.opentelemetry:4318
-    OTEL_SERVICE_NAME: redmine-demo
+    OTEL_SERVICE_NAME: redmine
     OTEL_PROPAGATORS: tracecontext,baggage
-    FLUENTD_URL: http://opentelemetry-collector.opentelemetry:8006/redmine-demo
+    FLUENTD_URL: http://opentelemetry-collector.opentelemetry:8006/redmine
   secretEnv:
     REDMINE_DB_PASSWORD: redmine-password
     REDMINE_SECRET_KEY_BASE: "10f4e6ef0ebed745be6889fd22931d119f6017a57864142912b739090561c17d48b19c370b90090c"
