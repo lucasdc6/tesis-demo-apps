@@ -75,6 +75,9 @@ Con arquitecturas distribuidas y microservicios:
 
 #### ¿Cómo comprender el comportamiento de un sistema en su ambiente productivo, independientemente de la tecnología?
 
+Notes:
+- Que hacer ante eventos demandantes (hotsale, blackfriday)
+
 <!--v-->
 
 ## Objetivo

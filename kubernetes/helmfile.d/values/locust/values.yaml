@@ -26,9 +26,9 @@ worker:
 service:
   type: ClusterIP
 
-hostAliases:
-  - ip: "10.96.12.80"
-    hostnames:
-      - redmine.localhost
-      - wordpress.localhost
-      - wagtail.localhost
+# hostAliases:
+#   - ip: "10.96.12.80"
+#     hostnames:
+#       - redmine.localhost
+#       - wordpress.localhost
+#       - wagtail.localhost

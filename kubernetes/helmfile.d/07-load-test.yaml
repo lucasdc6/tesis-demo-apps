@@ -9,4 +9,5 @@ releases:
     version: 0.34.*
     values:
       - values/locust/values.yaml
+      - values/locust/values.yaml.gotmpl
       - values/locust/extra-objects.yaml.gotmpl
