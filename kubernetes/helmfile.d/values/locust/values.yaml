@@ -1,6 +1,6 @@
 loadtest:
   name: demo
-  locust_locustfile: all.py
+  locust_locustfile: all.py,redmine.py,wagtail.py,wordpress.py
   locust_locustfile_configmap: locust-scripts
   locust_host: ""
 
