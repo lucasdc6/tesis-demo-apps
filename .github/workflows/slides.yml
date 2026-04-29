@@ -32,7 +32,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Generar sitio estático
-        run: uv run mkslides build docs/index.md --site-dir ../site
+        run: uv run mkslides build --site-dir ../site
 
       - name: Subir artefacto para GitHub Pages
         uses: actions/upload-pages-artifact@v3
