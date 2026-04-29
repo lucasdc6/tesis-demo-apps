@@ -103,9 +103,10 @@ route:
 autoscaling:
   enabled: true
   prometheusServerAddr: http://mimir-gateway.mimir.svc/prometheus
+  maxReplicas: 3
   triggers:
     - metricName: request-rate
-      threshold: "10"
+      threshold: "5"
       query: >
         sum(
           rate(

@@ -33,7 +33,7 @@ def _(environment, **kwargs):
 
 class WordPressUser(HttpUser):
     host = "http://wordpress.localhost"
-    weight = 3
+    weight = 2
     wait_time = between(1, 3)
 
     @task(4)
@@ -60,7 +60,7 @@ class WordPressUser(HttpUser):
 class RedmineUser(HttpUser):
     host = "http://redmine.localhost"
     weight = 2
-    wait_time = between(1, 4)
+    wait_time = between(1, 3)
 
     @task(3)
     def homepage(self):

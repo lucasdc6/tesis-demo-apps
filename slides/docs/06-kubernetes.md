@@ -16,14 +16,14 @@ triggers:
     metadata:
       serverAddress: http://lgtm-distributed-mimir-nginx.observability.svc/prometheus
       metricName: wagtail_request_rate
-      threshold: "10"
+      threshold: "5"
       query: >
         sum(rate(
           traces_spanmetrics_calls_total{service_name="wagtail"}[1m]
         ))
 ```
 
-Escala entre **1 y 10 réplicas** cuando supera **10 req/s por réplica**
+Escala entre **1 y 3 réplicas** cuando supera **5 req/s por réplica**
 
 <!--v-->
 
