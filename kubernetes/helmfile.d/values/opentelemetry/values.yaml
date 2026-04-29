@@ -56,12 +56,15 @@ config:
         - context: log
           statements:
             - set(resource.attributes["service.name"], attributes["service"])
+    groupbyattrs/nginx_gateway:
+      keys:
+        - upstream-service
     transform/nginx_gateway_traces:
       error_mode: ignore
       trace_statements:
-        - context: span
+        - context: resource
           statements:
-            - set(resource.attributes["service.name"], attributes["upstream-service"]) where resource.attributes["service.name"] == "ngf:nginx-gateway:nginx"
+            - set(attributes["service.name"], attributes["upstream-service"]) where attributes["service.name"] == "ngf:nginx-gateway:nginx"
 
   connectors:
     spanmetrics:
@@ -102,5 +105,5 @@ config:
         exporters: [otlphttp]
       traces:
         receivers: [otlp]
-        processors: [memory_limiter, filter/spans, transform/nginx_gateway_traces, batch]
+        processors: [memory_limiter, filter/spans, groupbyattrs/nginx_gateway, transform/nginx_gateway_traces, batch]
         exporters: [otlphttp, spanmetrics]

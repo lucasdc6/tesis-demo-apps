@@ -33,7 +33,7 @@ def _(environment, **kwargs):
 
 class WordPressUser(HttpUser):
     host = "http://wordpress.localhost"
-    weight = 2
+    weight = 3
     wait_time = between(1, 3)
 
     @task(4)
@@ -44,7 +44,7 @@ class WordPressUser(HttpUser):
     def hello_world_post(self):
         self.client.get("/?p=1", name=f"{self.host}/?p=[id]")
 
-    @task(2)
+    @task(1)
     def rest_api_posts(self):
         self.client.get("/wp-json/wp/v2/posts", name=f"{self.host}/wp-json/wp/v2/posts")
 
@@ -52,7 +52,7 @@ class WordPressUser(HttpUser):
     def rest_api_pages(self):
         self.client.get("/wp-json/wp/v2/pages", name=f"{self.host}/wp-json/wp/v2/pages")
 
-    @task(1)
+    @task(2)
     def login_page(self):
         self.client.get("/wp-login.php", name=f"{self.host}/wp-login.php")
 
