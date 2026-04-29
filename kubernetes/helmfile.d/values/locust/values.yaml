@@ -1,6 +1,6 @@
 loadtest:
   name: demo
-  locust_locustfile: ""
+  locust_locustfile: "all.py"
   locust_locustfile_configmap: locust-scripts
   locust_host: ""
 
