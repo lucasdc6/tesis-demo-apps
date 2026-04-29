@@ -86,6 +86,6 @@ autoscaling:
       query: >
         sum(
           rate(
-            traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}", span_kind="SPAN_KIND_SERVER"}[2m]
+            traces_spanmetrics_calls{service_name="{{ .Values.app.env.OTEL_SERVICE_NAME }}", span_kind="SPAN_KIND_SERVER", span_name="/"}[2m]
           )
         )
