@@ -1,0 +1,6 @@
+body {
+    background-image: url("./img/banner.png") !important;
+    background-size: 30vh, 20vh !important;
+    background-position: left 2ch bottom 3ch, left calc(2ch + 22vh) bottom 3ch !important;
+    background-repeat: no-repeat, no-repeat !important;
+}
