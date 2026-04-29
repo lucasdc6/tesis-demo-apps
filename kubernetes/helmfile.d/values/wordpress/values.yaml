@@ -51,13 +51,13 @@ app:
     WORDPRESS_NONCE_SALT: "random-key"
     WORDPRESS_ADMIN_PASSWORD: admin
     WORDPRESS_ADMIN_EMAIL: admin@example.com
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 256Mi
+  #   limits:
+  #     cpu: 500m
+  #     memory: 512Mi
   livenessProbe:
     tcpSocket:
       port: app

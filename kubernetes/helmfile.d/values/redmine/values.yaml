@@ -25,13 +25,13 @@ app:
   secretEnv:
     REDMINE_DB_PASSWORD: redmine-password
     REDMINE_SECRET_KEY_BASE: "10f4e6ef0ebed745be6889fd22931d119f6017a57864142912b739090561c17d48b19c370b90090c"
-  resources:
-    requests:
-      cpu: 200m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
+  # resources:
+  #   requests:
+  #     cpu: 200m
+  #     memory: 256Mi
+  #   limits:
+  #     cpu: 500m
+  #     memory: 512Mi
   livenessProbe:
     httpGet:
       path: /health_check/site
