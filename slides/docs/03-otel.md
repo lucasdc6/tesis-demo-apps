@@ -58,7 +58,8 @@ Ventajas:
 
 ## Instrumentación automática vs manual
 
-<br>
+<div class="r-hstack" style="gap: 4em; align-items: start; justify-content: center; margin-top: 1em;">
+<div style="text-align: left; width: 50%;">
 
 **Automática** _(zero-code instrumentation)_
 
@@ -66,13 +67,17 @@ Ventajas:
 - No requiere modificar el código fuente
 - Soporte varía según el lenguaje y framework
 
-<br>
+</div>
+<div style="text-align: left; width: 50%;">
 
 **Manual**
 
 - Instala el SDK e incorpora llamadas explícitas para crear spans
 - Mayor control y granularidad
 - Necesaria cuando no hay auto-instrumentador disponible
+
+</div>
+</div>
 
 <br>
 

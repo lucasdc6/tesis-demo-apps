@@ -99,4 +99,4 @@ Las tres señales pueden relacionarse entre sí mediante metadatos compartidos:
 
 <img src="./img/correlation.png" class="r-frame" />
 
-_Fuente: CNCF TAG Observability Whitepaper_
+> Fuente: CNCF TAG Observability Whitepaper
