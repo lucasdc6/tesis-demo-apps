@@ -19,7 +19,7 @@ triggers:
       threshold: "5"
       query: >
         sum(rate(
-          traces_spanmetrics_calls_total{service_name="wagtail", span_kind="SPAN_KIND_SERVER"}[1m]
+          traces_spanmetrics_calls_total{service_name="wagtail", span_name="/"}[1m]
         ))
 ```
 
