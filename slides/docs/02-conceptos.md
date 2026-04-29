@@ -92,3 +92,11 @@ Las tres señales pueden relacionarse entre sí mediante metadatos compartidos:
 <br>
 
 > _La correlación transforma datos aislados en información accionable_
+
+<!--v-->
+
+### Correlación de señales - Ejemplo práctico
+
+<img src="./img/correlation.png" class="r-frame" />
+
+_Fuente: CNCF TAG Observability Whitepaper_

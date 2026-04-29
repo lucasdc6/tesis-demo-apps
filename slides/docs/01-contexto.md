@@ -14,6 +14,19 @@ Notes:
 
 <!--v-->
 
+### La complejidad crece
+
+Con arquitecturas distribuidas y microservicios:
+
+- Múltiples servicios heterogéneos conviven en el mismo ecosistema
+- Cada componente puede escalar de forma independiente
+- Los contenedores son **efímeros**: visualizar logs ya no es trivial
+- Un incidente puede originarse en cualquier punto de la cadena
+
+> _Cuando algo falla en producción, ¿sabemos dónde mirar?_
+
+<!--v-->
+
 ### Evolución histórica
 
 <br>
@@ -50,19 +63,6 @@ Notes:
 
 <!--v-->
 
-### La complejidad crece
-
-Con arquitecturas distribuidas y microservicios:
-
-- Múltiples servicios heterogéneos conviven en el mismo ecosistema
-- Cada componente puede escalar de forma independiente
-- Los contenedores son **efímeros**: visualizar logs ya no es trivial
-- Un incidente puede originarse en cualquier punto de la cadena
-
-> _Cuando algo falla en producción, ¿sabemos dónde mirar?_
-
-<!--v-->
-
 ## Problemas
 
 - Los sistemas modernos exigen **99,9% de disponibilidad**
@@ -76,7 +76,8 @@ Con arquitecturas distribuidas y microservicios:
 #### ¿Cómo comprender el comportamiento de un sistema en su ambiente productivo, independientemente de la tecnología?
 
 Notes:
-- Que hacer ante eventos demandantes (hotsale, blackfriday)
+- SLO
+- Que hacer ante eventos demandantes (hotsale, blackfriday), evitar escalado manual
 
 <!--v-->
 
@@ -93,6 +94,9 @@ Con el fin de poder:
 - Determinar bajo qué condiciones escalar un servicio
 - Reducir el tiempo de diagnóstico ante incidentes
 - Automatizar la resiliencia mediante telemetría
+
+Notes:
+- MTTR
 
 <!--v-->
 
@@ -114,3 +118,6 @@ Estrategias estudiadas:
 <br>
 
 > _Esta tesina se enfoca en la **adaptabilidad de servicio** como estrategia de resiliencia._
+
+Notes:
+- Con plataformas como K8S e integraciones con Nubes, las arquitecturas distribuidas se simplifican

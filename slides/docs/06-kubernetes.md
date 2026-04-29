@@ -5,47 +5,6 @@ en un entorno equivalente al productivo
 
 <!--v-->
 
-## Cluster local con _Kind_ (Kubernetes in Docker)
-
-Infraestructura instalada con Helmfile:
-
-| Componente | Rol |
-|---|---|
-| `NGINX Fabric` | Controlador de Gateway API, expone servicios en `*.localhost` |
-| `KEDA` | Operador de escalado basado en métricas externas con soporte nativo para Prometheus |
-| `Ganesha NFS` | Servidor NFS para volúmenes compartidos entre réplicas (ReadWriteMany) |
-| `mysql-operator` | Operador para gestionar instancias de MySQL como recursos de Kubernetes |
-| `CloudNativePG` | Operador para gestionar clústeres de PostgreSQL nativos en Kubernetes |
-
-<!--v-->
-
-## Cluster local con _Kind_ (Kubernetes in Docker)
-
-
-| Componente | Rol |
-|---|---|
-| `Grafana` | Visualización unificada de las tres señales de observabilidad |
-| `Mimir` | Almacenamiento de métricas compatible con la API de Prometheus |
-| `Loki` | Almacenamiento de logs indexado por etiquetas |
-| `Tempo` | Almacenamiento de trazas distribuidas multi-formato |
-| `OpenTelemetry Collector` | Recolección, procesamiento y exportación centralizada de telemetría |
-
-<!--v-->
-
-## Helm Chart genérico
-
-Un único chart en `helm/` despliega cualquiera de las tres aplicaciones.
-
-Recursos generados por release:
-
-- **Deployment** — pod con dos contenedores: app + sidecar Nginx
-- **ConfigMap / Secret** — variables de entorno (credenciales, endpoints OTel)
-- **Ingress** — expone el servicio en `<app>.localhost`
-- **ScaledObject** — reglas de escalado horizontal con KEDA
-- **PersistentVolumeClaim** — almacenamiento para archivos compartidos
-
-<!--v-->
-
 ## Escalado automático con KEDA
 
 **KEDA** (Kubernetes Event-Driven Autoscaling) escala Deployments
@@ -64,7 +23,7 @@ triggers:
         ))
 ```
 
-Escala entre **1 y 5 réplicas** cuando supera **10 req/s por réplica**
+Escala entre **1 y 10 réplicas** cuando supera **10 req/s por réplica**
 
 <!--v-->
 
@@ -87,7 +46,9 @@ flowchart TD
 
 ## Prueba de carga con Locust
 
-Ingresar al sitio <a href="http://locust.localhost" target="_blank">Locust</a>
+Ingresar al sitio <a href="https://locust.tesis.lucasdc.ar" target="_blank">Locust</a>
+
+Luego, visualizar los datos en <a href="https://grafana.tesis.lucasdc.ar" target="_blank">Grafana</a>
 
 
 <!--v-->

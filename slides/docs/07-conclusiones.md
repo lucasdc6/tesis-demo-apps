@@ -49,24 +49,6 @@ se proyecta como la interfaz universal de la telemetría en la industria.
 
 <!--v-->
 
-## Sobre el stack LGTM
-
-Alternativa open-source viable a soluciones comerciales:
-
-| Componente | Diferenciador |
-|---|---|
-| **Mimir** | Alta cardinalidad · API Prometheus compatible · OTLP |
-| **Loki** | Indexado solo por labels → menor costo de almacenamiento |
-| **Tempo** | Multi-formato · integración nativa con Grafana |
-| **Grafana** | Correlación interactiva entre las tres señales en un solo panel |
-
-<br>
-
-El conector `spanmetrics` del OTel Collector deriva métricas RED
-directamente desde trazas, **sin agentes adicionales**.
-
-<!--v-->
-
 ## Sobre la observabilidad y la resiliencia
 
 > _La adaptación automática solo es posible si el sistema

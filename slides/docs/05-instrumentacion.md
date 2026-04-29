@@ -84,15 +84,10 @@ El SDK de Ruby **no soportaba exportar logs vía OTLP** al momento de implementa
 
 El formatter incluye `trace_id` y `span_id` en cada línea de log:
 
-```ruby
+```ruby [3|10|11]
 if ENV['FLUENTD_URL']
   uri = URI.parse ENV['FLUENTD_URL']
-  config.logger = Fluent::Logger::LevelFluentLogger.new(nil,
-                                                        host: uri.host,
-                                                        port: uri.port,
-                                                        use_nonblock: true,
-                                                        wait_writeable: false
-                                                      )
+  config.logger = LevelFluentLogger.new(nil, host: uri.host, port: uri.port, use_nonblock: true, wait_writeable: false)
   config.logger.formatter = proc do |severity, datetime, progname, message|
     map = { level: severity }
     map[:message]   = message if message
