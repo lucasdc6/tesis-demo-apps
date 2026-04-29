@@ -1,7 +1,7 @@
 from locust import HttpUser, task, between
 
 
-class RedmineUser(HttpUser):
+class SingleRedmineUser(HttpUser):
     """
     Simula un usuario navegando Redmine.
     Ejecutar con: --host=http://redmine.localhost

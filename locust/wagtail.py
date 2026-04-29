@@ -1,7 +1,7 @@
 from locust import HttpUser, task, between
 
 
-class WagtailUser(HttpUser):
+class SingleWagtailUser(HttpUser):
     """
     Simula un usuario navegando Wagtail (bakerydemo).
     Ejecutar con: --host=http://wagtail.localhost

@@ -1,7 +1,7 @@
 from locust import HttpUser, task, between
 
 
-class WordPressUser(HttpUser):
+class SingleWordPressUser(HttpUser):
     """
     Simula un usuario navegando WordPress.
     Ejecutar con: --host=http://wordpress.localhost
