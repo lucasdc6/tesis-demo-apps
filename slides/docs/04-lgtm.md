@@ -30,7 +30,7 @@ Almacenamiento de métricas de **alta cardinalidad** y retención configurable
 Usado en esta tesina como fuente de métricas para el escalado horizontal:
 
 ```promql
-sum(rate(traces_spanmetrics_calls_total{service_name="<servicio>"}[1m]))
+sum(rate(traces_spanmetrics_calls_total{service_name="<servicio>", span_kind="SPAN_KIND_SERVER"}[1m]))
 ```
 
 <!--v-->
