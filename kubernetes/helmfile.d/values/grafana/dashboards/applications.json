@@ -634,7 +634,7 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\"}[2m]))",
+          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", span_kind=\"SPAN_KIND_SERVER\"}[2m]))",
           "instant": false,
           "legendFormat": "Rate",
           "range": true,
@@ -733,7 +733,7 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", http_status_code=~\"[45]..\"}[2m])) by(http_status_code)",
+          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", http_status_code=~\"[45]..\", span_kind=\"SPAN_KIND_SERVER\"}[2m])) by(http_status_code)",
           "instant": false,
           "legendFormat": "{{http_status_code}}",
           "range": true,
@@ -833,7 +833,7 @@
         {
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50,\n  sum(rate(traces_spanmetrics_duration_bucket{service_name=\"$service_name\"}[2m])) by (le)\n)",
+          "expr": "histogram_quantile(0.50,\n  sum(rate(traces_spanmetrics_duration_bucket{service_name=\"$service_name\", span_kind=\"SPAN_KIND_SERVER\"}[2m])) by (le)\n)",
           "legendFormat": "P50",
           "range": true,
           "refId": "A"
@@ -844,7 +844,7 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95,\n  sum(rate(traces_spanmetrics_duration_bucket{service_name=\"$service_name\"}[2m])) by (le)\n)",
+          "expr": "histogram_quantile(0.95,\n  sum(rate(traces_spanmetrics_duration_bucket{service_name=\"$service_name\", span_kind=\"SPAN_KIND_SERVER\"}[2m])) by (le)\n)",
           "legendFormat": "P95",
           "range": true,
           "refId": "B"
@@ -855,7 +855,7 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99,\n  sum(rate(traces_spanmetrics_duration_bucket{service_name=\"$service_name\"}[2m])) by (le)\n)",
+          "expr": "histogram_quantile(0.99,\n  sum(rate(traces_spanmetrics_duration_bucket{service_name=\"$service_name\", span_kind=\"SPAN_KIND_SERVER\"}[2m])) by (le)\n)",
           "legendFormat": "P99",
           "range": true,
           "refId": "C"
