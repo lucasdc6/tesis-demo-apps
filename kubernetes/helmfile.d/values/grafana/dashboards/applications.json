@@ -634,7 +634,8 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", span_name=\"/\"}[2m]))",
+          "exemplar": true,
+          "expr": "sum(rate(traces_spanmetrics_calls{service_name=\"$service_name\", span_name=\"/\"}[2m]))",
           "instant": false,
           "legendFormat": "RPS",
           "range": true,
@@ -733,7 +734,8 @@
             "uid": "prom"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_duration_count{service_name=\"$service_name\", http_status_code=~\"[45]..\", span_name=\"/\"}[2m])) by(http_status_code)",
+          "exemplar": true,
+          "expr": "sum(rate(traces_spanmetrics_calls{service_name=\"$service_name\", http_status_code=~\"[45]..\", span_name=\"/\"}[2m])) by(http_status_code)",
           "instant": false,
           "legendFormat": "{{http_status_code}}",
           "range": true,
