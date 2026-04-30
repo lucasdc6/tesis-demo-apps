@@ -14,3 +14,7 @@ dashboards:
     applications:
       json: |
         {{ readFile "dashboards/applications.json" | nindent 8 }}
+
+alerting:
+  applications.yaml: |
+    {{ readFile "alerts/applications.yaml" | nindent 4 }}
