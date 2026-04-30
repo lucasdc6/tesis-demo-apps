@@ -24,7 +24,7 @@ groups:
                 instant: false
                 interval: ""
                 intervalMs: 15000
-                legendFormat: '{{http_status_code}}'
+                legendFormat: '{{ `{{http_status_code}}` }}'
                 maxDataPoints: 43200
                 range: true
                 refId: A
@@ -84,7 +84,7 @@ groups:
           annotations:
             __dashboardUid__: glknq9
             __panelId__: "2"
-            dashboard_url: https://grafana.tesis.lucasdc.ar/d/glknq9/application?viewPanel=2&var-service_name={{ $labels.service_name }}
+            dashboard_url: https://grafana.tesis.lucasdc.ar/d/glknq9/application?viewPanel=2&var-service_name={{ `{{ $labels.service_name }}` }}
           labels: {}
           isPaused: false
           notification_settings:

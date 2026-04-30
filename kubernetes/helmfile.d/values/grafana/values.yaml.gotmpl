@@ -16,5 +16,5 @@ dashboards:
         {{ readFile "dashboards/applications.json" | nindent 8 }}
 
 alerting:
-  applications.yaml: |
+  rules.yaml:
     {{ readFile "alerts/applications.yaml" | nindent 4 }}
